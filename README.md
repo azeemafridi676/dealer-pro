@@ -38,9 +38,7 @@ graph TD
   Backend -->|"MongoDB"| Database[("MongoDB")]
   Backend -->|"Email Service"| Email["Email (EJS Templates)"]
   Backend -->|"Socket.IO"| Realtime["Real-Time Updates"]
-  Frontend -->|"Stripe Checkout"| Stripe["Stripe"]
-  Backend -->|"Stripe SDK/Webhooks"| Stripe
-  Backend -->|"Cloudinary"| Media["Media Storage"]
+  Frontend -->|"Cloudinary"| Media["Media Storage"]
 ```
 
 ---
@@ -54,7 +52,6 @@ sequenceDiagram
   participant Backend
   participant DB
   participant Email
-  participant Stripe
   participant Socket
   participant Media
 
@@ -62,8 +59,6 @@ sequenceDiagram
   Frontend->>Backend: API Calls (REST, WebSocket)
   Backend->>DB: Query/Update Data
   Backend->>Media: Upload/Download Documents
-  Backend->>Stripe: Payment/Subscription
-  Stripe-->>Backend: Webhook Events
   Backend->>Socket: Emit Real-Time Events
   Socket-->>Frontend: Real-Time Updates
   Backend->>Email: Send Notifications/Docs
@@ -192,14 +187,13 @@ DealerPro uses Socket.IO for real-time updates, such as agreement status, notifi
 - **Vehicles:** CRUD, inventory, acquisition/outlay tracking, profit analysis, media uploads (Cloudinary).
 - **Customers:** CRUD, segmentation, document management, agreement linking.
 - **Agreements:** Sales, purchase, agency; workflow, digital signature, document storage.
-- **Invoices:** Swish/traditional, Stripe integration, payment tracking, reporting.
+- **Invoices:** Swish/traditional, payment tracking, reporting.
 - **RBAC:** Role/permission management, multi-tenancy, hierarchical permissions.
 - **Corporation:** Multi-org support, user/vehicle/agreement isolation.
 - **Notifications:** Event-driven, socket/email, audit logging.
 - **Dashboard:** Aggregated analytics, charts, activity logs.
 - **File Uploads:** Cloudinary for images/docs, secure access.
 - **Email:** EJS templates for agreements, OTP, password reset, notifications.
-- **Webhooks:** Stripe event handling, payment status updates.
 
 ---
 
@@ -207,7 +201,6 @@ DealerPro uses Socket.IO for real-time updates, such as agreement status, notifi
 
 - JWT authentication, RBAC, secure file uploads, audit logging, and encryption for sensitive data.
 - Real-time updates via Socket.IO for agreements, notifications, and payments.
-- Stripe is the source of truth for payments; webhooks update all related data.
 - Cloudinary stores all media securely.
 - Robust error handling and logging throughout backend and frontend.
 
