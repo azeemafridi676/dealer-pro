@@ -1,9 +1,6 @@
 # DealerPro Platform Documentation
 
-> **For developer-focused details, see: [Developer Focused Explaination.md](./Developer%20Focused%20Explaination.md)**
-> 
-> **For client-focused details, see: [Client Focused Explaination.md](./Client%20Focused%20Explaination.md)**
->
+
 > **This is the definitive, unified technical and conceptual overview of DealerPro (Cardesk), integrating both frontend and backend, their data flows, relationships, and core logic.**
 
 ---
