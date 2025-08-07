@@ -1,0 +1,558 @@
+<div class="container mx-auto py-6">
+  <!-- Stats Cards Section -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <!-- Total Payments Card -->
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-medium text-gray-500">Total Payments</h3>
+        <div class="p-3 bg-primary/10 w-[3.5rem] h-[3.5rem] flex justify-center items-center rounded-full">
+          <i class="ri-money-dollar-circle-line text-xl text-primary"></i>
+        </div>
+      </div>
+      <div *ngIf="loading; else totalPaymentsContent" class="flex items-end gap-2">
+        <div class="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+        <div class="h-4 w-12 bg-gray-100 rounded animate-pulse mb-1"></div>
+      </div>
+      <ng-template #totalPaymentsContent>
+        <div class="flex items-end gap-2">
+          <span class="text-3xl font-bold">{{ stats.totalPayments || 0 }}</span>
+          <span class="text-sm text-gray-500 mb-1">payments</span>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Average Payment Card -->
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-medium text-gray-500">Average Payment</h3>
+        <div class="p-3 bg-green/10 w-[3.5rem] h-[3.5rem] flex justify-center items-center rounded-full">
+          <i class="ri-calculator-line text-xl text-green-600"></i>
+        </div>
+      </div>
+      <div *ngIf="loading; else avgPaymentContent" class="flex items-end gap-2">
+        <div class="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+        <div class="h-4 w-12 bg-gray-100 rounded animate-pulse mb-1"></div>
+      </div>
+      <ng-template #avgPaymentContent>
+        <div class="flex items-end gap-2">
+          <span class="text-3xl font-bold">{{ stats.averagePaymentAmount | number : "1.0-0" }} kr</span>
+          <span class="text-sm text-gray-500 mb-1">avg</span>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Payments Status Card -->
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-medium text-gray-500">Payments Status</h3>
+        <div class="p-3 bg-primary/10 w-[3.5rem] h-[3.5rem] flex justify-center items-center rounded-full">
+          <i class="ri-pie-chart-line text-xl text-blue-600"></i>
+        </div>
+      </div>
+      <div *ngIf="loading; else paymentsStatusContent" class="flex items-end gap-2">
+        <div class="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+        <div class="h-4 w-12 bg-gray-100 rounded animate-pulse mb-1"></div>
+      </div>
+      <ng-template #paymentsStatusContent>
+        <div class="flex items-end gap-2">
+          <span class="text-3xl font-bold">{{ getTotalPayments() }}</span>
+          <span class="text-sm text-gray-500 mb-1">
+            Completed:
+            {{ getPaymentStatusCount(SwishPaymentStatus.COMPLETED) }}, Pending:
+            {{ getPaymentStatusCount(SwishPaymentStatus.PENDING) }}, Failed:
+            {{ getPaymentStatusCount(SwishPaymentStatus.FAILED) }}
+          </span>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Top Actions Section -->
+  <form [formGroup]="filterForm">
+    <div class="flex flex-wrap gap-[40%] mb-6">
+      <div class="flex-1 w-30">
+        <input type="text" placeholder="Search by Reference, Name, Email..."
+          class="form-input w-full rounded-xl border border-gray-200 px-4 py-3 h-12" formControlName="searchTerm" />
+      </div>
+      <div class="flex gap-2 relative">
+        <!-- Filter Button (opens right-side panel) -->
+        <button type="button"
+          class="bg-white border border-gray-200 text-gray-700 px-4 py-2 h-12 rounded-xl flex items-center hover:bg-gray-50 transition shadow-sm"
+          (click)="openFilterPanel()">
+          <i class="ri-filter-3-line mr-2"></i>Filter
+        </button>
+        <!-- Add Payment Button -->
+        <button type="button" (click)="navigateToAddPayment()"
+          class="bg-primary hover:bg-primary-dark text-white px-4 py-2 h-12 rounded-xl transition-colors flex items-center shadow-sm">
+          <i class="ri-add-line mr-2"></i>Add Payment
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Right-side Filter Panel with Overlay -->
+  <div *ngIf="showFilterPanel">
+    <!-- Overlay -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity" (click)="closeFilterPanel()"></div>
+    <!-- Side Panel -->
+    <div
+      class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-50 shadow-xl transition-transform duration-300"
+      @modalAnimation>
+      <div class="flex flex-col h-full">
+        <div class="flex items-center justify-between p-6 border-b">
+          <h2 class="text-xl font-bold">Filter Payments</h2>
+          <button (click)="closeFilterPanel()" class="text-gray-400 hover:text-gray-600 text-2xl">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <form [formGroup]="filterForm" class="flex-1 flex flex-col p-6 gap-4">
+          <!-- Category -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">Payment Category</label>
+            <app-custom-select 
+              formControlName="categoryAdv"
+              [options]="categoryOptions"
+              placeholder="Select category"
+            ></app-custom-select>
+          </div>
+
+          <!-- Status -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">Payment Status</label>
+            <app-custom-select 
+              formControlName="statusAdv"
+              [options]="statusOptions"
+              placeholder="Select status"
+            ></app-custom-select>
+          </div>
+
+          <!-- Date Range -->
+          <div class="flex gap-2 mb-4">
+            <div class="flex-1">
+              <label class="block text-gray-700 font-medium mb-1">From Date</label>
+              <input type="date"
+                class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+                formControlName="fromDateAdv" />
+            </div>
+            <div class="flex-1">
+              <label class="block text-gray-700 font-medium mb-1">To Date</label>
+              <input type="date"
+                class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+                formControlName="toDateAdv" />
+            </div>
+          </div>
+
+          <!-- Amount Range -->
+          <div class="flex gap-2 mb-4">
+            <div class="flex-1">
+              <label class="block text-gray-700 font-medium mb-1">Min Amount</label>
+              <input type="number" placeholder="Min kr"
+                class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+                formControlName="minAmountAdv" />
+            </div>
+            <div class="flex-1">
+              <label class="block text-gray-700 font-medium mb-1">Max Amount</label>
+              <input type="number" placeholder="Max kr"
+                class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+                formControlName="maxAmountAdv" />
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex justify-between mt-auto">
+            <button type="button" (click)="resetFilterPanel()"
+              class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">
+              Reset
+            </button>
+            <button type="button" (click)="applyFilterPanel()"
+              class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80 transition">
+              Apply Filter
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payments Table -->
+  <div class="rounded-xl shadow overflow-hidden border border-primary/10 bg-white">
+    <div class="overflow-x-auto relative">
+      <!-- Loading Error Message -->
+      <div *ngIf="loadingError" class="p-4 text-center text-red-500 bg-red-50">
+        {{ loadingError }}
+        <button (click)="loadPayments()" class="ml-2 text-primary hover:underline">
+          Try Again
+        </button>
+      </div>
+
+      <!-- Skeleton Loading -->
+      <table *ngIf="loading" class="min-w-full rounded-xl overflow-hidden bg-white shadow">
+        <thead>
+          <tr>
+            <th class="w-10 px-6 py-3"></th>
+            <th *ngFor="let col of selectedColumns"
+              class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              <div class="h-4 w-24 bg-gray-200 rounded"></div>
+            </th>
+            <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">
+              <div class="h-4 w-10 bg-gray-200 rounded"></div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let i of [1, 2, 3, 4, 5]" class="border-b last:border-b-0 animate-pulse">
+            <td class="text-center px-2 py-4">
+              <div class="h-6 w-6 bg-gray-200 rounded"></div>
+            </td>
+            <td *ngFor="let col of selectedColumns" class="px-4 py-4">
+              <div class="h-4 w-32 bg-gray-200 rounded"></div>
+            </td>
+            <td class="px-4 py-4 text-right">
+              <div class="h-6 w-10 bg-gray-200 rounded"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Actual Content -->
+      <table *ngIf="!loading" class="min-w-full rounded-xl overflow-hidden bg-white shadow">
+        <thead>
+          <tr>
+            <th class="w-10 px-6 py-3"></th>
+            <th *ngFor="let col of selectedColumns"
+              class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              {{ col }}
+            </th>
+            <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">
+              <button (click)="showColumnSettings = true"
+                class="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <i class="ri-settings-3-line text-xl"></i>
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Not found state -->
+          <tr *ngIf="!loading && paginatedPayments.length === 0">
+            <td [attr.colspan]="selectedColumns.length + 2" class="text-center py-8 text-gray-500">
+              No payments found.
+            </td>
+          </tr>
+          <ng-container *ngIf="!loading">
+            <ng-container *ngFor="let payment of paginatedPayments; let i = index">
+              <tr class="border-b last:border-b-0 hover:bg-gray-50 cursor-pointer select-none text-gray-900"
+                (click)="toggleAccordion(getRowKey(payment, i), payment)">
+                <td class="text-center px-2">
+                  <button class="flex items-center justify-center text-gray-500 text-2xl" [ngClass]="{
+                      'rotate-90 text-primary':
+                        expandedRowKey === getRowKey(payment, i)
+                    }" aria-label="Expand details">
+                    <i class="ri-arrow-right-s-line"></i>
+                  </button>
+                </td>
+                <td *ngFor="let col of selectedColumns" class="px-4 py-4 text-gray-900">
+                  @switch (col) { @case ('Reference') {
+                  <div class="flex items-center">
+                    <div class="flex rounded-full border border-gray-300 overflow-hidden shadow-sm items-center" style="min-width:60px;">
+                      <span class="flex items-center justify-center bg-primary text-white font-medium text-sm w-6 h-6" style="border-top-left-radius:9999px;border-bottom-left-radius:9999px;">R</span>
+                      <span class="flex items-center px-2 font-medium text-black text-sm bg-white h-6" style="border-top-right-radius:9999px;border-bottom-right-radius:9999px;">{{ payment.reference || "N/A" }}</span>
+                    </div>
+                  </div>
+                  } @case ('Name') {
+                  <span class="text-black font-medium">{{
+                    getColumnValue(payment, 'Name')
+                    }}</span>
+                  } @case ('Amount') {
+                  {{ payment.totalAmount | number : "1.2-2" }} kr } @case
+                  ('Date') {
+                  {{ payment.date | date : "mediumDate" }}
+                  } @case ('Category') {
+                  <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                    {{ payment.category || 'N/A' }}
+                  </span>
+                  } @case ('Status') {
+                  <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700" [ngClass]="getStatusColor(payment.status)">
+                    {{ getStatusDisplay(payment.status) }}
+                  </span>
+                  } @default {
+                  {{ getColumnValue(payment, col) }}
+                  } }
+                </td>
+                <td class="px-4 py-4 text-right">
+                  <!-- Always-visible delete button -->
+                  <button class="text-red-600 hover:text-red-800" title="Delete" (click)="
+                      $event.stopPropagation();
+                      expandedPayment = payment;
+                      showDeleteModal = true
+                    ">
+                    <i class="ri-delete-bin-line text-2xl"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="expandedRowKey === getRowKey(payment, i)">
+                <td [attr.colspan]="selectedColumns.length + 2" class="bg-gray-50 p-0">
+                  <!-- Payment Details -->
+                  <div class="p-0" @fadeInOut>
+                    <!-- Action buttons -->
+                    <div class="flex flex-wrap gap-2 px-6 py-4 border-b border-gray-200 bg-white">
+                      <button
+                        class="bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg border border-gray-200 flex items-center gap-2">
+                        <i class="ri-file-list-3-line"></i> View Invoice
+                      </button>
+                      <button
+                        class="bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg border border-gray-200 flex items-center gap-2">
+                        <i class="ri-bank-card-line"></i> Payment Details
+                      </button>
+                      <button
+                        class="bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg border border-gray-200 flex items-center gap-2">
+                        <i class="ri-user-line"></i> Contact Info
+                      </button>
+                      <!-- Add delete button in expanded view for convenience -->
+                      <button
+                        class="bg-white hover:bg-gray-50 text-red font-medium py-2 px-4 rounded-lg border border-gray-200 flex items-center gap-2"
+                        (click)="
+                          $event.stopPropagation();
+                          expandedPayment = payment;
+                          showDeleteModal = true
+                        ">
+                        <i class="ri-delete-bin-line"></i> Delete
+                      </button>
+                    </div>
+
+                    <!-- Payment detail panels -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
+                      <!-- Payment Details -->
+                      <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">
+                          Payment Details
+                        </h3>
+                        <div class="space-y-3">
+                          <div>
+                            <label class="text-sm text-gray-500">Payment ID:</label>
+                            <div class="text-sm font-medium">
+                              {{ payment.swish_id || "N/A" }}
+                            </div>
+                          </div>
+                          <div>
+                            <label class="text-sm text-gray-500">Related Invoice:</label>
+                            <div class="text-sm font-medium">
+                              {{ payment.receipt_id?.receiptNumber || "N/A" }}
+                            </div>
+                          </div>
+                          <div>
+                            <label class="text-sm text-gray-500">Category:</label>
+                            <div class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 w-max">
+                              {{ payment.category || 'N/A' }}
+                            </div>
+                          </div>
+                          <div>
+                            <label class="text-sm text-gray-500">Total Amount:</label>
+                            <div class="text-sm font-medium">
+                              {{ payment.totalAmount | number : "1.2-2" }} kr
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Processing Information -->
+                      <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">
+                          Processing Information
+                        </h3>
+                        <div class="space-y-3">
+                          <div>
+                            <label class="text-sm text-gray-500">Status:</label>
+                            <div class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 w-max" [ngClass]="getStatusColor(payment.status)">
+                              {{ getStatusDisplay(payment.status) }}
+                            </div>
+                          </div>
+                          <div>
+                            <label class="text-sm text-gray-500">Processing Time:</label>
+                            <div class="text-sm font-medium">
+                              {{ payment.date | date : "mediumDate" }}
+                            </div>
+                          </div>
+                          <div>
+                            <label class="text-sm text-gray-500">Notes:</label>
+                            <div class="text-sm font-medium">
+                              {{ payment.description || "N/A" }}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Contact Information -->
+                      <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">
+                          Contact Information
+                        </h3>
+                        <div class="space-y-3">
+                          <div>
+                            <label class="text-sm text-gray-500">Contact Person:</label>
+                            <div class="text-sm font-medium">
+                              {{ payment.contactInfo?.contactPerson || payment.name || "N/A" }}
+                            </div>
+                          </div>
+                          <div>
+                            <label class="text-sm text-gray-500">Contact Email:</label>
+                            <div class="text-sm font-medium">
+                              {{ payment.email || "N/A" }}
+                            </div>
+                          </div>
+                          <div>
+                            <label class="text-sm text-gray-500">Contact Phone:</label>
+                            <div class="text-sm font-medium">
+                              {{ payment.telephoneNumber || "N/A" }}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div *ngIf="!loading && totalItems > 0" class="mt-6 flex justify-between items-center">
+    <div class="text-sm text-gray-500">
+      Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to
+      {{
+      currentPage * itemsPerPage > totalItems
+      ? totalItems
+      : currentPage * itemsPerPage
+      }}
+      of {{ totalItems }} items
+    </div>
+    <nav aria-label="Pagination" class="flex space-x-1">
+      <button [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)"
+        class="p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Previous page">
+        <i class="ri-arrow-left-s-line"></i>
+      </button>
+      <ng-container *ngFor="let page of getDisplayedPageNumbers()">
+        <button (click)="changePage(page)" [ngClass]="{
+            'bg-primary text-white hover:bg-primary/90': page === currentPage,
+            'bg-white text-gray-500 hover:bg-gray-50': page !== currentPage
+          }" class="h-9 w-9 flex items-center justify-center rounded-full border border-gray-200">
+          {{ page }}
+        </button>
+      </ng-container>
+      <button [disabled]="currentPage === totalPages || totalPages === 0" (click)="changePage(currentPage + 1)"
+        class="p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Next page">
+        <i class="ri-arrow-right-s-line"></i>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div *ngIf="showDeleteModal"
+    class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+    <div
+      class="bg-white rounded-xl w-full max-w-md p-8 border border-gray-200 relative shadow-xl flex flex-col items-center">
+      <button (click)="showDeleteModal = false"
+        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl">
+        <i class="ri-close-line"></i>
+      </button>
+      <i class="ri-delete-bin-line text-primary text-4xl mb-4"></i>
+      <h2 class="text-xl font-bold text-gray-900 mb-2">Delete Payment</h2>
+      <p class="text-gray-600 mb-6 text-center">
+        Are you sure you want to delete this payment? This action cannot be
+        undone.
+      </p>
+      <div class="flex gap-4 w-full justify-center">
+        <button type="button" (click)="showDeleteModal = false"
+          class="px-5 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">
+          Cancel
+        </button>
+        <button type="button" (click)="deletePayment()" [disabled]="loading"
+          class="px-5 py-2 bg-primary text-white rounded-md hover:bg-primary/80 transition flex items-center gap-2">
+          <svg *ngIf="loading" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+            </path>
+          </svg>
+          {{ loading ? "Deleting..." : "Delete" }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Column Settings Modal -->
+  <div *ngIf="showColumnSettings" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] flex flex-col">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-6 border-b">
+        <h2 class="text-xl font-semibold">Column Settings</h2>
+        <button (click)="showColumnSettings = false" class="text-gray-500 hover:text-gray-700">
+          <i class="ri-close-line text-2xl"></i>
+        </button>
+      </div>
+
+      <!-- Modal Content -->
+      <div class="p-6 overflow-y-auto flex-1">
+        <div class="flex gap-8">
+          <!-- Available Columns -->
+          <div class="flex-1 flex flex-col min-h-0">
+            <h3 class="text-lg font-semibold mb-4">Available Columns</h3>
+            <div class="text-sm text-gray-500 mb-2">
+              Total: {{ availableColumns.length }}
+            </div>
+            <div class="overflow-y-auto flex-1 max-h-[250px]">
+              @for (col of availableColumns; track col) {
+              <div class="flex items-center justify-between p-3 border-b last:border-b-0 hover:bg-gray-50">
+                <span class="text-gray-900">{{ col }}</span>
+                <button (click)="addColumn(col)" class="text-primary hover:text-primary-dark">
+                  <i class="ri-add-line text-xl"></i>
+                </button>
+              </div>
+              }
+            </div>
+          </div>
+
+          <!-- Selected Columns -->
+          <div class="flex-1 flex flex-col min-h-0">
+            <h3 class="text-lg font-semibold mb-4">Selected Columns</h3>
+            <div class="text-sm text-gray-500 mb-2">
+              Total: {{ selectedColumns.length }}
+            </div>
+            <div class="overflow-y-auto flex-1 max-h-[250px]" cdkDropList #selectedList="cdkDropList"
+              [cdkDropListData]="selectedColumns" (cdkDropListDropped)="onColumnDrop($event)">
+              @for (col of selectedColumns; track col) {
+              <div class="flex items-center justify-between p-3 border-b last:border-b-0 hover:bg-gray-50" cdkDrag>
+                <div class="flex items-center gap-2">
+                  <i class="ri-drag-move-line text-gray-400"></i>
+                  <span class="text-gray-900">{{ col }}</span>
+                </div>
+                <button (click)="removeColumn($index)" class="text-gray-500 hover:text-gray-700">
+                  <i class="ri-close-line text-xl"></i>
+                </button>
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex justify-end gap-4 p-6 border-t">
+        <button (click)="showColumnSettings = false"
+          class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition">
+          Cancel
+        </button>
+        <button (click)="saveColumnSettings()"
+          class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition">
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,99 @@
+// Custom styles for the roles component
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+// Transition for accordion
+.transition-transform {
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+// Custom checkbox styles
+input[type="checkbox"] {
+  &:checked {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+  }
+  
+  &:focus {
+    ring-color: #4f46e5;
+    ring-width: 2px;
+  }
+}
+
+// Hover effects for role items
+.hover\:bg-gray-50:hover {
+  background-color: #f9fafb;
+}
+
+// Custom button styles
+.bg-indigo-600 {
+  background-color: #4f46e5;
+  
+  &:hover {
+    background-color: #4338ca;
+  }
+}
+
+// Custom icon styles
+.text-indigo-600 {
+  color: #4f46e5;
+}
+
+// Custom gradient backgrounds
+.bg-gradient-to-br {
+  background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+}
+
+.from-indigo-100 {
+  --tw-gradient-from: #e0e7ff;
+  --tw-gradient-to: rgba(224, 231, 255, 0);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.to-indigo-200 {
+  --tw-gradient-to: #c7d2fe;
+}
+
+// Custom rounded corners
+.rounded-xl {
+  border-radius: 0.75rem;
+}
+
+// Custom shadow
+.shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+// Custom border
+.border-gray-100 {
+  border-color: #f3f4f6;
+}
+
+// Custom text colors
+.text-gray-500 {
+  color: #6b7280;
+}
+
+.text-gray-900 {
+  color: #111827;
+}
+
+// Custom spacing
+.space-y-8 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(2rem * var(--tw-space-y-reverse));
+}
+
+// Custom max width
+.max-w-7xl {
+  max-width: 80rem;
+}
+
+// Custom min height
+.min-h-\[80vh\] {
+  min-height: 80vh;
+}

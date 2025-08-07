@@ -1,0 +1,128 @@
+<div class="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 px-4">
+    <div class="max-w-md w-full space-y-8">
+        <!-- Logo/Title Section -->
+        <div class="text-center">
+            <span class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-wide [text-shadow:_0_1px_0_rgb(0_0_0_/_40%)]">DealerPro</span>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">Welcome back! Please login to your account.</p>
+        </div>
+
+        <!-- Login Form -->
+        <form class="mt-8 space-y-6" [formGroup]="loginForm">
+            <div class="space-y-4">
+                <!-- Email Input -->
+                <div>
+                    <input type="email" formControlName="email"
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 
+                        focus:border-gray-900 dark:focus:border-white focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 
+                        transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        placeholder="Email address">
+                    <div *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.touched || loginForm.get('email')?.dirty)"
+                        class="text-red text-sm mt-1 ml-1">
+                        Please enter a valid email address
+                    </div>
+                </div>
+
+                <!-- Password Input -->
+                <div>
+                    <div class="relative">
+                        <input [type]="showPassword ? 'text' : 'password'" formControlName="password"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 
+                            focus:border-gray-900 dark:focus:border-white focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 
+                            transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                            placeholder="Password">
+                        <button type="button" 
+                            (click)="togglePasswordVisibility()" 
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                            <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.touched || loginForm.get('password')?.dirty)"
+                        class="text-red text-sm mt-1 ml-1">
+                        Password is required
+                    </div>
+                </div>
+            </div>
+
+            <!-- Remember Me & Forgot Password -->
+            <div class="flex items-center justify-between">
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" class="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-gray-200 dark:focus:ring-gray-700">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Remember me</span>
+                </label>
+                <a routerLink="/forgot-password" class="text-sm text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                    Forgot password?
+                </a>
+            </div>
+
+            <!-- Sign In Button -->
+            <button type="submit"
+                (click)="onSubmit()"
+                class="w-full px-6 py-3 bg-primary text-white 
+                font-medium text-base tracking-wider rounded-lg
+                transition-all duration-300 hover:bg-primary/90
+                border-2 border-primary
+                relative h-[48px] flex items-center justify-center"
+                [disabled]="loading">
+                <ng-container *ngIf="loading; else buttonText">
+                    <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <app-spinner class="text-white"></app-spinner>
+                        Sign In ...
+                    </div>
+                </ng-container>
+                <ng-template #buttonText>
+                    Sign In
+                </ng-template>
+            </button>
+            
+            <div class="text-center mt-4">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Don't have an account? 
+                    <a routerLink="/sign-up" class="text-primary hover:underline">Sign up</a>
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <!-- Ban Modal -->
+    <div *ngIf="showBanModal" class="fixed inset-0 bg-gray-900/50 z-50 flex items-center justify-center">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-8 transform transition-all"
+             [class.scale-100]="showBanModal"
+             [class.opacity-100]="showBanModal">
+            <div class="flex flex-col items-center text-center">
+                <div class="w-16 h-16 bg-red dark:bg-red/20 rounded-full flex items-center justify-center mb-6">
+                    <i class="ri-forbid-line text-3xl text-red dark:text-red"></i>
+                </div>
+                
+                <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+                    Account Banned
+                </h3>
+                
+                <p class="text-gray-600 dark:text-gray-400 mb-6">
+                    Your account has been banned from accessing the platform.
+                    <ng-container *ngIf="banDetails?.reason">
+                        <br><br>
+                        <span class="font-medium">Reason:</span><br>
+                        {{banDetails?.reason}}
+                    </ng-container>
+                    <ng-container *ngIf="banDetails?.bannedAt">
+                        <br><br>
+                        <span class="font-medium">Banned on:</span><br>
+                        {{banDetails?.bannedAt | date:'medium'}}
+                    </ng-container>
+                </p>
+
+                <button (click)="closeBanModal()" 
+                        class="w-full px-6 py-3 text-gray-900 dark:text-white rounded-xl 
+                        hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

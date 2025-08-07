@@ -1,0 +1,31 @@
+<!-- Modal Backdrop -->
+<div *ngIf="show" class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center">
+  <!-- Modal Content -->
+  <div class=" rounded-xl shadow-lg w-full max-w-md mx-4 transform transition-all">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-primary/10">
+      <h3 class="text-lg font-semibold text-primary">{{ title }}</h3>
+    </div>
+    
+    <!-- Body -->
+    <div class="px-6 py-4">
+      <p class="text-primary/60">{{ message }}</p>
+    </div>
+    
+    <!-- Footer -->
+    <div class="px-6 py-4  rounded-b-xl flex justify-end space-x-3">
+      <button
+        (click)="onCancel()"
+        class="px-4 py-2 border border-primary/20 rounded-md shadow-sm text-sm font-medium text-primary  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/20"
+      >
+        {{ cancelButtonText }}
+      </button>
+      <button
+        (click)="onConfirm()"
+        [class]="'px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/20 ' + confirmButtonClass"
+      >
+        {{ confirmButtonText }}
+      </button>
+    </div>
+  </div>
+</div>

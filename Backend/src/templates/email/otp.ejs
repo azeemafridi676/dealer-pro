@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your OTP Code</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .email-wrapper {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin: 20px 0;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+        .otp-container {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .otp-code {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c3e50;
+            letter-spacing: 5px;
+            font-family: monospace;
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        .message {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .footer {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 30px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .warning {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fdf3f2;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="email-wrapper">
+            <div class="header">
+                <h1 style="color: #2c3e50; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: 0.5px; text-shadow: 0 1px 0 rgba(0,0,0,0.1);">DealerPro</h1>
+                <h2 style="color: #2c3e50; margin: 10px 0 0 0;">Your Verification Code</h2>
+            </div>
+            
+            <div class="message">
+                <p>Hello <%= userEmail %>,</p>
+                <p>We received a request to verify your device. Please use the following code to complete your verification:</p>
+            </div>
+
+            <div class="otp-container">
+                <div class="otp-code"><%= otp %></div>
+                <p>This code will expire in 10 minutes.</p>
+            </div>
+
+            <div class="warning">
+                <p>⚠️ If you didn't request this code, please ignore this email or contact support if you have concerns.</p>
+            </div>
+
+            <div class="footer">
+                <p>This is an automated message, please do not reply to this email.</p>
+                <p>© <%= new Date().getFullYear() %> <%= process.env.APP_NAME %>. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

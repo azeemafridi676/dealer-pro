@@ -1,0 +1,19 @@
+/* Swish Add Component Styles */
+:host {
+  display: block;
+}
+
+// Optional: Add any specific styles for this component
+input:focus, 
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.2);
+  border-color: rgb(var(--primary-rgb));
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .grid-cols-1, .grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}

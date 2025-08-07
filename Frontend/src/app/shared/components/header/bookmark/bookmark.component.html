@@ -1,0 +1,95 @@
+<div class="notification-box"><i data-feather="star"> </i></div>
+<div
+  class="onhover-show-div bookmark-flip"
+  [class.active]="bookmarkFlip || bookmark"
+>
+  <div class="flip-card">
+    <div class="flip-card-inner" [class.flipped]="bookmarkFlip">
+      <div class="front">
+        <ul class="droplet-dropdown bookmark-dropdown">
+          <li class="gradient-primary">
+            <i data-feather="star"></i>
+            <h3 class="mb-0 f-18">Bookmark</h3>
+          </li>
+          <li>
+            <div class="row">
+              <ng-container *ngFor="let item of bookmarkItems">
+                <div class="col-4 text-center">
+                  <a
+                    placement="top"
+                    [ngbTooltip]="item?.title"
+                    [routerLink]="item?.path"
+                    routerLinkActive="item?.active"
+                  >
+                  <app-feather-icon [icon]="item.icon"></app-feather-icon>
+                  </a>
+                </div>
+              </ng-container>
+            </div>
+          </li>
+          <li class="text-center" (click)="flipBookMark()">
+            <button class="flip-btn f-w-500" id="flip-btn">Add New Bookmark</button>
+          </li>
+        </ul>
+      </div>
+      <div class="back">
+        <ul>
+          <li>
+            <div class="droplet-dropdown bookmark-dropdown flip-back-content">
+              <input
+                type="text"
+                [(ngModel)]="text"
+                [ngModelOptions]="{ standalone: true }"
+                (keyup)="searchTerm(text)"
+                placeholder="search..."
+              />
+              <div
+                class="Typeahead-menu custom-scrollbar"
+                [class.is-open]="searchResult"
+                *ngIf="menuItems?.length"
+                id="boomark-search-outer"
+              >
+                <div
+                  class="ProfileCard u-cf"
+                  *ngFor="let item of menuItems | slice : 0 : 8"
+                >
+                  <div class="ProfileCard-avatar">
+                    <app-feather-icon [icon]="item.icon"></app-feather-icon>
+                  </div>
+                  <div class="ProfileCard-details">
+                    <div class="ProfileCard-realName">
+                      <a
+                        [routerLink]="item?.path"
+                        class="realname"
+                        (click)="removeFix()"
+                        >{{ item?.title }}</a
+                      >
+                      <span class="pull-right" (click)="addToBookmark(item)">
+                        <a>
+                          <i
+                            class="fa fa-star-o f-18"
+                            [class.starred]="item.bookmark"
+                          ></i>
+                        </a>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="Typeahead-menu" [class.is-open]="searchResultEmpty">
+                <div class="tt-dataset tt-dataset-0">
+                  <div class="EmptyMessage">
+                    Opps!! There are no result found.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="pb-0" (click)="flipBookMark()">
+            <button class="d-block flip-back f-w-500" id="flip-back">Back</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

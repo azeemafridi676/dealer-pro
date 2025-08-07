@@ -1,0 +1,120 @@
+<h6 class="pt-0 mt-0">Layout Type</h6>
+<ul class="main-layout layout-grid">
+  <li
+    data-attr="ltr"
+    [ngClass]="{ active: layoutType == 'ltr' }"
+    (click)="customizeLayoutType('ltr')"
+  >
+    <div class="header bg-light">
+      <ul>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+    </div>
+    <div class="body">
+      <ul>
+        <li class="bg-light sidebar"></li>
+        <li class="bg-light body">
+          <span class="badge badge-primary">LTR</span>
+        </li>
+      </ul>
+    </div>
+  </li>
+  <li
+    data-attr="rtl"
+    [ngClass]="{ active: layoutType == 'rtl' }"
+    (click)="customizeLayoutType('rtl')"
+  >
+    <div class="header bg-light">
+      <ul>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+    </div>
+    <div class="body">
+      <ul>
+        <li class="bg-light body">
+          <span class="badge badge-primary">RTL</span>
+        </li>
+        <li class="bg-light sidebar"></li>
+      </ul>
+    </div>
+  </li>
+  <li
+    data-attr="Box"
+    class="box-layout"
+    [ngClass]="{ active: layoutType == 'box-layout' }"
+    (click)="customizeLayoutType('box-layout')"
+  >
+    <div class="header bg-light">
+      <ul>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+    </div>
+    <div class="body">
+      <ul>
+        <li class="bg-light sidebar"></li>
+        <li class="bg-light body">
+          <span class="badge badge-primary">BOX</span>
+        </li>
+      </ul>
+    </div>
+  </li>
+</ul>
+<h6>Sidebar Type</h6>
+<ul class="sidebar-type layout-grid">
+  <li
+    data-attr="normal-sidebar"
+    [class.d-none]="screenwidth < 991"
+    (click)="customizeSidebarType('horizontal-wrapper')"
+  >
+    <div class="header bg-light">
+      <ul>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+    </div>
+    <div class="body">
+      <ul>
+        <li class="bg-dark sidebar"></li>
+        <li class="bg-light body"></li>
+      </ul>
+    </div>
+  </li>
+  <li
+    data-attr="compact-sidebar"
+    (click)="customizeSidebarType('compact-wrapper')"
+  >
+    <div class="header bg-light">
+      <ul>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+    </div>
+    <div class="body">
+      <ul>
+        <li class="bg-dark sidebar compact"></li>
+        <li class="bg-light body"></li>
+      </ul>
+    </div>
+  </li>
+</ul>
+<h6>Animation</h6>
+<ul>
+  <select
+    class="form-select"
+    [(ngModel)]="selectedValue"
+    (click)="getAnimation()"
+  >
+    <option disabled selected value="undefined">Select</option>
+    <option>Default</option>
+    <option>isRight</option>
+    <option>isLeft</option>
+  </select>
+</ul>

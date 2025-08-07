@@ -1,0 +1,40 @@
+<div class="input-group">
+  <input
+    class="form-control"
+    [class.open]="open"
+    [(ngModel)]="text"
+    [ngModelOptions]="{ standalone: true }"
+    (keyup)="searchTerm(text)"
+    type="text"
+    autocomplete="off"
+    placeholder="Search.."
+  /><span class="input-group-text mobile-search" (click)="openMenu()">
+    <i data-feather="search"></i
+  ></span>
+</div>
+<div
+  class="Typeahead-menu"
+  [class.is-open]="searchResult"
+  *ngIf="menuItems?.length"
+  id="search-outer"
+  [class.open]="open"
+>
+  <div
+    class="ProfileCard u-cf"
+    *ngFor="let menuItem of menuItems | slice : 0 : 8"
+  >
+    <div class="ProfileCard-avatar">
+      <app-feather-icon [icon]="menuItem.icon"></app-feather-icon>
+    </div>
+    <div class="ProfileCard-details">
+      <div class="ProfileCard-realName">
+        <a
+          [routerLink]="menuItem?.path"
+          class="realname"
+          (click)="removeFix()"
+          >{{ menuItem?.title }}</a
+        >
+      </div>
+    </div>
+  </div>
+</div>

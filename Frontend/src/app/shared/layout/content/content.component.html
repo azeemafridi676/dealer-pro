@@ -1,0 +1,10 @@
+<app-navbar [isMobileMenuOpen]="isMobileMenuOpen" (mobileMenuToggled)="toggleMobileMenu()"></app-navbar>
+
+<div class="page-body min-h-screen bg-gradient-to-b from-[#eff6ff]  to-[#fff]">
+    <div *ngIf="isFilter" id="backdrop" (click)="closeMobileMenu()"
+        class="fixed top-0 left-0 z-30 w-full h-full bg-black/50"></div>
+    <app-upgrade-notification></app-upgrade-notification>
+    <div class="px-4 md:px-8 lg:px-10 pt-20 pb-5">
+        <router-outlet #outlet="outlet"></router-outlet>
+    </div>
+</div>

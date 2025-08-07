@@ -1,0 +1,870 @@
+<div class="container mx-auto py-6">
+  <!-- Stats Cards Section -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <!-- Private Customers Card -->
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-medium text-gray-500">Total purchasing customers</h3>
+        <div class="p-3 bg-blue/10 w-[3.5rem] h-[3.5rem] flex justify-center items-center rounded-full">
+          <i class="ri-user-3-line text-xl text-blue-600"></i>
+        </div>
+      </div>
+      <div *ngIf="loading; else privateCustomersContent" class="flex items-end gap-2">
+        <div class="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+        <div class="h-4 w-12 bg-gray-100 rounded animate-pulse mb-1"></div>
+      </div>
+      <ng-template #privateCustomersContent>
+        <div class="flex items-end gap-2">
+          <span class="text-3xl font-bold">{{ stats.privateCustomers || 0 }}</span>
+          <span class="text-sm text-blue-500 mb-1">Purchased vehicles</span>
+        </div>
+      </ng-template>
+    </div>
+    
+    <!-- Company Customers Card -->
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-medium text-gray-500">Total sales customers</h3>
+        <div class="p-3 bg-green/10 w-[3.5rem] h-[3.5rem] flex justify-center items-center rounded-full">
+          <i class="ri-building-2-line text-xl text-green-600"></i>
+        </div>
+      </div>
+      <div *ngIf="loading; else companyCustomersContent" class="flex items-end gap-2">
+        <div class="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+        <div class="h-4 w-12 bg-gray-100 rounded animate-pulse mb-1"></div>
+      </div>
+      <ng-template #companyCustomersContent>
+        <div class="flex items-end gap-2">
+          <span class="text-3xl font-bold">{{ stats.companyCustomers || 0 }}</span>
+          <span class="text-sm text-green-500 mb-1">Vehicles sold</span>
+        </div>
+      </ng-template>
+    </div>
+    
+    <!-- Other Agreement Card -->
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-medium text-gray-500">Total brokerage clients</h3>
+        <div class="p-3 bg-purple/10 w-[3.5rem] h-[3.5rem] flex justify-center items-center rounded-full">
+          <i class="ri-group-line text-xl text-purple-600"></i>
+        </div>
+      </div>
+      <div *ngIf="loading; else otherAgreementsContent" class="flex items-end gap-2">
+        <div class="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+        <div class="h-4 w-12 bg-gray-100 rounded animate-pulse mb-1"></div>
+      </div>
+      <ng-template #otherAgreementsContent>
+        <div class="flex items-end gap-2">
+          <span class="text-3xl font-bold">{{ stats.otherAgreements || 0 }}</span>
+          <span class="text-sm text-purple-500 mb-1">Brokered vehicles</span>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Top Actions Section -->
+  <form [formGroup]="filterForm">
+    <div class="flex flex-wrap gap-[40%] mb-6">
+      <div class="flex-1 w-30">
+        <input type="text" placeholder="Search by Name, Email, or Address" class="form-input w-full rounded-xl border border-gray-200 px-4 py-3 h-12" formControlName="searchTerm" (input)="onSearchInput($event)"/>
+      </div>
+      <div class="flex gap-2 relative">
+        <!-- Filter Button (opens right-side panel) -->
+        <button type="button" class="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center hover:bg-gray-50 transition shadow-sm" (click)="showAdvancedSearchPanel = true">
+          <i class="ri-filter-3-line mr-2"></i>Filter
+        </button>
+        <!-- New Customer Button -->
+        <button type="button" class="bg-primary text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-primary/80 transition" (click)="openCustomerModal()">
+          <i class="ri-user-add-line"></i>New Customer
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Right-side Filter Panel with Overlay -->
+  <div *ngIf="showAdvancedSearchPanel">
+    <!-- Overlay -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity" (click)="showAdvancedSearchPanel = false"></div>
+    <!-- Side Panel -->
+    <div class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-50 shadow-xl transition-transform duration-300" @modalAnimation>
+      <div class="flex flex-col h-full">
+        <div class="flex items-center justify-between p-6 border-b">
+          <h2 class="text-xl font-bold">Filter Customers</h2>
+          <button (click)="showAdvancedSearchPanel = false" class="text-gray-400 hover:text-gray-600 text-2xl">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <form [formGroup]="filterForm" class="flex-1 flex flex-col p-6 gap-4">
+          <!-- Type -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">Type</label>
+            <app-custom-select 
+              formControlName="typeAdv"
+              [options]="customerTypeOptions"
+              placeholder="Select type"
+            ></app-custom-select>
+          </div>
+          <!-- From Date -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">From date</label>
+            <input type="date" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50" formControlName="fromDate" />
+          </div>
+          <!-- To Date -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">To date</label>
+            <input type="date" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50" formControlName="toDate" />
+          </div>
+          <!-- Actions -->
+          <div class="flex justify-between mt-auto">
+            <button type="button" (click)="resetAdvancedFilters()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">Reset</button>
+            <button type="button" (click)="applyAdvancedSearch()" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80 transition">Apply Filter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Table -->
+  <div
+    class="rounded-xl shadow overflow-hidden border border-primary/10 bg-white"
+  >
+    <div class="overflow-x-auto relative">
+      <!-- Loading Error Message -->
+      <div *ngIf="loadingError" class="p-4 text-center text-red bg-red">
+        {{ loadingError }}
+        <button
+          (click)="loadCustomers()"
+          class="ml-2 text-primary hover:underline"
+        >
+          Try Again
+        </button>
+      </div>
+      <!-- Skeleton Loading -->
+      <table
+        *ngIf="loading"
+        class="min-w-full rounded-xl overflow-hidden bg-white shadow"
+      >
+        <thead>
+          <tr>
+            <th class="w-10 px-6 py-3"></th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+            >
+              <div class="h-4 w-20 bg-gray-200 rounded"></div>
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+            >
+              <div class="h-4 w-24 bg-gray-200 rounded"></div>
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+            >
+              <div class="h-4 w-28 bg-gray-200 rounded"></div>
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+            >
+              <div class="h-4 w-20 bg-gray-200 rounded"></div>
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+            >
+              <div class="h-4 w-24 bg-gray-200 rounded"></div>
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+            >
+              <div class="h-4 w-20 bg-gray-200 rounded"></div>
+            </th>
+            <th
+              class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider"
+            >
+              <div class="h-4 w-10 bg-gray-200 rounded"></div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let i of [1, 2, 3, 4, 5]"
+            class="border-b last:border-b-0 animate-pulse"
+          >
+            <td class="text-center px-2 py-4">
+              <div class="h-6 w-6 bg-gray-200 rounded"></div>
+            </td>
+            <td class="px-4 py-4">
+              <div class="h-4 w-32 bg-gray-200 rounded"></div>
+            </td>
+            <td class="px-4 py-4">
+              <div class="h-4 w-40 bg-gray-200 rounded"></div>
+            </td>
+            <td class="px-4 py-4">
+              <div class="h-4 w-48 bg-gray-200 rounded"></div>
+            </td>
+            <td class="px-4 py-4">
+              <div class="h-4 w-28 bg-gray-200 rounded"></div>
+            </td>
+            <td class="px-4 py-4">
+              <div class="h-4 w-24 bg-gray-200 rounded"></div>
+            </td>
+            <td class="px-4 py-4">
+              <div class="h-4 w-20 bg-gray-200 rounded"></div>
+            </td>
+            <td class="px-4 py-4 text-right">
+              <div class="h-6 w-10 bg-gray-200 rounded"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- Actual Content -->
+      <table
+        *ngIf="!loading && !loadingError"
+        class="min-w-full rounded-xl overflow-hidden bg-white shadow"
+      >
+        <thead>
+          <tr>
+            <th class="w-10 px-6 py-3"></th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+            >
+              Name
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+            >
+              Email
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+            >
+              Address
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+            >
+              Telephone
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+            >
+              Agreement
+            </th>
+            <th
+              class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider"
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="!loading && paginatedCustomers.length === 0">
+            <td colspan="8" class="text-center py-8 text-gray-500">
+              No customers found.
+            </td>
+          </tr>
+          <ng-container *ngIf="!loading">
+            <ng-container *ngFor="let customer of paginatedCustomers; let i = index">
+              <tr
+                class="border-b last:border-b-0 hover:bg-gray-50 cursor-pointer select-none  text-gray-900"
+                (click)="toggleAccordion(getRowKey(customer, i), customer)"
+              >
+                <td class="text-center px-2">
+                  <button
+                    class="flex items-center justify-center text-gray-500 text-2xl"
+                    [ngClass]="{
+                      'rotate-90 text-primary':
+                        expandedRowKey === getRowKey(customer, i)
+                    }"
+                    aria-label="Expand details"
+                  >
+                    <i class="ri-arrow-right-s-line"></i>
+                  </button>
+                </td>
+                <td class="px-4 py-4  text-gray-900">
+                  {{ customer.name || 'N/A' }}
+                </td>
+                <td class="px-4 py-4 text-gray-900">{{ customer.email || 'N/A' }}</td>
+                <td class="px-4 py-4 text-gray-900">{{ customer.address || 'N/A' }}</td>
+                <td class="px-4 py-4 text-gray-900">
+                  {{ customer.telephone || 'N/A' }}
+                </td>
+                <td class="px-4 py-4">
+                  <span
+                    *ngIf="customer.agreementType && customer.agreementType !== 'N/A'"
+                    [ngClass]="{
+                      'bg-blue-100 text-blue-700': customer.agreementType === 'Sales',
+                      'bg-green-100 text-green-700': customer.agreementType === 'Purchase',
+                      'bg-purple-100 text-purple-700': customer.agreementType === 'Agency'
+                    }"
+                    class="px-2 py-0.5 rounded-full text-xs font-medium"
+                  >
+                    {{ customer.agreementType }}
+                  </span>
+                  <span *ngIf="!customer.agreementType || customer.agreementType === 'N/A'" class="text-gray-500">N/A</span>
+                </td>
+                <td class="px-4 py-4 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button 
+                      class="text-red-600 hover:text-red-800" 
+                      title="Delete"
+                      (click)="confirmDeleteCustomer(customer.customer_id)"
+                    >
+                      <i class="ri-delete-bin-line text-2xl"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="expandedRowKey === getRowKey(customer, i)">
+                <td [attr.colspan]="8" class="bg-transparent px-0 py-0">
+                  <div class="w-full px-6 pt-6 pb-10">
+                    <!-- Top Action Buttons -->
+                    <div class="flex justify-start mb-6 w-full">
+                      <button
+                        class="flex items-center justify-center gap-2 px-6 py-2 border border-gray-200 rounded-2xl bg-white text-gray-900 font-semibold hover:bg-gray-50 transition"
+                        (click)="openEditCustomerModal(customer)"
+                      >
+                        <i class="ri-edit-2-line text-lg text-primary"></i> Edit Customer
+                      </button>
+                    </div>
+                    <!-- Card Layout -->
+                    <div class="flex flex-col md:flex-row gap-6">
+                      <!-- Merged Customer and Contract Information Card -->
+                      <div class="w-full rounded-2xl bg-[#F5F6F7] p-0 overflow-hidden shadow-sm border border-gray-100">
+                        <div class="bg-[#E5E6E8] px-6 py-4 text-xl font-bold text-gray-900">
+                          Customer Information
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
+                          <!-- Personal Information -->
+                          <div>
+                            <div class="text-gray-500 font-medium mb-1">Name</div>
+                            <div class="text-gray-900 text-sm">{{ customer.name || 'N/A' }}</div>
+                          </div>
+                          <div>
+                            <div class="text-gray-500 font-medium mb-1">Customer Number</div>
+                            <div class="text-gray-900">{{ customer?.person_details?.legalId || customer?.company_details?.organizationNumber || 'N/A' }}</div>
+                          </div>
+                          <div>
+                            <div class="text-gray-500 font-medium mb-1">Customer Type</div>
+                            <div class="text-gray-900">
+                              <span *ngIf="customer.customerType"
+                                    [ngClass]="{
+                                      'bg-blue-100 text-blue-700': customer.customerType === 'Private Individual',
+                                      'bg-green-100 text-green-700': customer.customerType === 'Company'
+                                    }"
+                                    class="px-2 py-0.5 rounded-full text-xs font-medium">
+                                {{ customer.customerType }}
+                              </span>
+                              <span *ngIf="!customer.customerType" class="text-gray-500">N/A</span>
+                            </div>
+                          </div>
+
+                          <!-- Contact Information -->
+                          <div>
+                            <div class="flex items-center gap-2 text-gray-500 font-medium mb-1">
+                              <i class="ri-mail-line"></i> Email
+                            </div>
+                            <div class="text-gray-900">{{ customer.email || 'N/A' }}</div>
+                          </div>
+                          <div>
+                            <div class="flex items-center gap-2 text-gray-500 font-medium mb-1">
+                              <i class="ri-phone-line"></i> Telephone
+                            </div>
+                            <div class="text-gray-900">{{ customer.telephone || 'N/A' }}</div>
+                          </div>
+                          <div>
+                            <div class="text-gray-500 font-medium mb-1">Address</div>
+                            <div class="text-gray-900">{{ customer?.person_details?.addresses[0]?.street || customer?.company_details?.street_address || 'N/A' }}</div>
+                          </div>
+
+                          <!-- Additional Details -->
+                        
+                          <div>
+                            <div class="text-gray-500 font-medium mb-1">Postal Code</div>
+                            <div class="text-gray-900">{{ customer?.person_details?.addresses[0]?.zip || customer?.company_details?.postal_code || 'N/A' }}</div>
+                          </div>
+                          <div>
+                            <div class="text-gray-500 font-medium mb-1">Location</div>
+                            <div class="text-gray-900">{{ customer?.person_details?.addresses[0]?.city || customer?.company_details?.registered_city || 'N/A' }}</div>
+                          </div>
+
+                          <!-- Status and Contract Information -->
+                          <div class="col-span-1 md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
+                            <div>
+                              <div class="text-gray-500 font-medium mb-1">Agreement</div>
+                              <span
+                                *ngIf="customer.agreementType && customer.agreementType !== 'N/A'"
+                                [ngClass]="{
+                                  'bg-blue-100 text-blue-700': customer.agreementType === 'Sales',
+                                  'bg-green-100 text-green-700': customer.agreementType === 'Purchase',
+                                  'bg-purple-100 text-purple-700': customer.agreementType === 'Agency'
+                                }"
+                                class="px-2 py-0.5 rounded-full text-xs font-medium"
+                              >
+                                {{ customer.agreementType }}
+                              </span>
+                              <span *ngIf="!customer.agreementType || customer.agreementType === 'N/A'" class="text-gray-500">N/A</span>
+                            </div>
+                            <div>
+                              <div class="text-gray-500 font-medium mb-1">Status</div>
+                              <span *ngIf="customer.status"
+                                    class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-medium">
+                                {{ customer.status }}
+                              </span>
+                              <span *ngIf="!customer.status" class="text-gray-500">N/A</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Pagination Controls -->
+  <div *ngIf="!loading && !loadingError && totalItems > 0" class="mt-6 flex justify-between items-center">
+    <div class="text-sm text-gray-500">
+      Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ currentPage * itemsPerPage > totalItems ? totalItems : currentPage * itemsPerPage }} of {{ totalItems }} items
+    </div>
+    <nav aria-label="Pagination" class="flex space-x-1">
+      <button 
+        [disabled]="currentPage === 1"
+        (click)="changePage(currentPage - 1)" 
+        class="p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Previous page"
+      >
+        <i class="ri-arrow-left-s-line"></i>
+      </button>
+      <ng-container *ngFor="let page of getDisplayedPageNumbers()">
+        <button 
+          (click)="changePage(page)"
+          [ngClass]="{
+            'bg-primary text-white hover:bg-primary/90': page === currentPage,
+            'bg-white text-gray-500 hover:bg-gray-50': page !== currentPage
+          }"
+          class="h-9 w-9 flex items-center justify-center rounded-full border border-gray-200"
+        >
+          {{ page }}
+        </button>
+      </ng-container>
+      <button 
+        [disabled]="currentPage === totalPages || totalPages === 0"
+        (click)="changePage(currentPage + 1)" 
+        class="p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Next page"
+      >
+        <i class="ri-arrow-right-s-line"></i>
+      </button>
+    </nav>
+  </div>
+</div>
+
+<!-- New Customer Modal -->
+<div *ngIf="isCustomerModalVisible" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-lg w-full max-w-4xl p-4 max-h-[95vh] overflow-y-auto border border-gray-200 dark:border-gray-700 relative shadow-xl">
+    <button (click)="closeCustomerModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 text-2xl">
+      <i class="ri-close-line"></i>
+    </button>
+    
+    <div class="flex items-center space-x-2 mb-4">
+      <i class="ri-user-add-line text-xl text-main"></i>
+      <h2 class="text-xl font-bold text-main">Add New Customer</h2>
+    </div>
+    
+    <form [formGroup]="customerForm" (ngSubmit)="onCustomerSubmit()" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Full Name</label>
+          <div class="relative">
+            <i class="ri-user-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input 
+              type="text" 
+              formControlName="name" 
+              placeholder="Enter full name" 
+              class="w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+            >
+          </div>
+          <div *ngIf="customerForm.get('name')?.touched && customerForm.get('name')?.invalid" class="text-xs text-red mt-1">
+            Name is required.
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Email Address</label>
+          <div class="relative">
+            <i class="ri-mail-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input 
+              type="email" 
+              formControlName="email" 
+              placeholder="Enter email address" 
+              class="w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+            >
+          </div>
+          <div *ngIf="customerForm.get('email')?.touched && customerForm.get('email')?.invalid" class="text-xs text-red mt-1">
+            <ng-container *ngIf="customerForm.get('email')?.errors?.['required']">Email is required.</ng-container>
+            <ng-container *ngIf="customerForm.get('email')?.errors?.['email']">Invalid email address.</ng-container>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Telephone</label>
+          <div class="relative">
+            <i class="ri-phone-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input 
+              type="text" 
+              formControlName="telephone" 
+              placeholder="Enter telephone number" 
+              class="w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+            >
+          </div>
+          <div *ngIf="customerForm.get('telephone')?.touched && customerForm.get('telephone')?.invalid" class="text-xs text-red mt-1">
+            Telephone is required.
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Customer Type</label>
+          <app-custom-select 
+            formControlName="type"
+            [options]="customerTypeOptions"
+            placeholder="Select customer type"
+          ></app-custom-select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Address</label>
+          <input 
+            type="text" 
+            formControlName="address" 
+            placeholder="Enter address" 
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+          >
+          <div *ngIf="customerForm.get('address')?.touched && customerForm.get('address')?.invalid" class="text-xs text-red mt-1">
+            Address is required.
+          </div>
+        </div>
+
+        <div *ngIf="customerForm.get('type')?.value === 'Company'" class="flex items-center space-x-2">
+          <input 
+            type="text" 
+            formControlName="organizationNumber" 
+            placeholder="Enter organization number" 
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+          >
+          <button 
+            type="button" 
+            (click)="searchOrganization()"
+            [disabled]="orgSearchLoading"
+            class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors flex items-center space-x-2"
+          >
+            <span *ngIf="!orgSearchLoading">Search</span>
+            <span *ngIf="orgSearchLoading" class="flex items-center">
+              <svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Searching...
+            </span>
+          </button>
+        </div>
+        <div *ngIf="orgError" class="text-red-500 text-sm mt-1">{{ orgError }}</div>
+
+        <div *ngIf="customerForm.get('type')?.value !== 'Company'" class="flex items-center space-x-2">
+          <input 
+            type="text" 
+            formControlName="socialSecurityNumber" 
+            placeholder="Enter social security number" 
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+          >
+          <button 
+            type="button" 
+            (click)="searchPerson()"
+            [disabled]="personSearchLoading"
+            class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors flex items-center space-x-2"
+          >
+            <span *ngIf="!personSearchLoading">Search</span>
+            <span *ngIf="personSearchLoading" class="flex items-center">
+              <svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Searching...
+            </span>
+          </button>
+        </div>
+        <div *ngIf="personError" class="text-red-500 text-sm mt-1">{{ personError }}</div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Postal Code</label>
+          <input 
+            type="text" 
+            formControlName="postalCode" 
+            placeholder="Enter postal code" 
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+          >
+          <div *ngIf="customerForm.get('postalCode')?.touched && customerForm.get('postalCode')?.invalid" class="text-xs text-red mt-1">
+            Postal Code is required.
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Location</label>
+          <input 
+            type="text" 
+            formControlName="location" 
+            placeholder="Enter location" 
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+          >
+          <div *ngIf="customerForm.get('location')?.touched && customerForm.get('location')?.invalid" class="text-xs text-red mt-1">
+            Location is required.
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end mt-4">
+        <button 
+          type="submit" 
+          [disabled]="customerModalLoading" 
+          class="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary-dark transition-colors flex items-center border border-primary/20"
+        >
+          <ng-container *ngIf="!customerModalLoading">
+            Add Customer
+          </ng-container>
+          <ng-container *ngIf="customerModalLoading">
+            <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Adding...
+          </ng-container>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div 
+  *ngIf="showDeleteConfirmationModal" 
+  class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
+>
+  <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+    <div class="text-center">
+      <i class="ri-delete-bin-line text-primary text-4xl mb-4"></i>
+      <h3 class="text-lg leading-6 font-medium text-gray-900 mt-3">Delete Customer</h3>
+      <div class="mt-2 px-7 py-3">
+        <p class="text-sm text-gray-500">
+          Are you sure you want to delete this customer? This action cannot be undone.
+        </p>
+      </div>
+      <div class="mt-5 sm:flex sm:items-center sm:justify-center">
+        <div class="sm:flex sm:items-center sm:justify-center">
+          <button 
+            type="button" 
+            (click)="cancelDeleteCustomer()"
+            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white  font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+          >
+            Cancel
+          </button>
+          <button 
+            type="button" 
+            (click)="deleteCustomer()"
+            [disabled]="deletingCustomer"
+            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary  font-medium text-white hover:bg-primary-dark sm:ml-3 sm:w-auto sm:text-sm"
+          >
+            <ng-container *ngIf="!deletingCustomer">Delete</ng-container>
+            <ng-container *ngIf="deletingCustomer">
+              <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Deleting...
+            </ng-container>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Customer Modal -->
+<div *ngIf="isEditCustomerModalVisible" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-lg w-full max-w-4xl p-4 max-h-[95vh] overflow-y-auto border border-gray-200 dark:border-gray-700 relative shadow-xl">
+    <button (click)="closeEditCustomerModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 text-2xl">
+      <i class="ri-close-line"></i>
+    </button>
+    
+    <div class="flex items-center space-x-2 mb-4">
+      <i class="ri-edit-2-line text-xl text-main"></i>
+      <h2 class="text-xl font-bold text-main">Edit Customer</h2>
+    </div>
+    
+    <form [formGroup]="editCustomerForm" (ngSubmit)="onCustomerEditSubmit()" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Full Name</label>
+          <div class="relative">
+            <i class="ri-user-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input 
+              type="text" 
+              formControlName="name" 
+              placeholder="Enter full name" 
+              class="w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+            >
+          </div>
+          <div *ngIf="editCustomerForm.get('name')?.touched && editCustomerForm.get('name')?.invalid" class="text-xs text-red mt-1">
+            Name is required.
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Email Address</label>
+          <div class="relative">
+            <i class="ri-mail-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input 
+              type="email" 
+              formControlName="email" 
+              placeholder="Enter email address" 
+              class="w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+            >
+          </div>
+          <div *ngIf="editCustomerForm.get('email')?.touched && editCustomerForm.get('email')?.invalid" class="text-xs text-red mt-1">
+            <ng-container *ngIf="editCustomerForm.get('email')?.errors?.['required']">Email is required.</ng-container>
+            <ng-container *ngIf="editCustomerForm.get('email')?.errors?.['email']">Invalid email address.</ng-container>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Telephone</label>
+          <div class="relative">
+            <i class="ri-phone-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input 
+              type="text" 
+              formControlName="telephone" 
+              placeholder="Enter telephone number" 
+              class="w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+            >
+          </div>
+          <div *ngIf="editCustomerForm.get('telephone')?.touched && editCustomerForm.get('telephone')?.invalid" class="text-xs text-red mt-1">
+            Telephone is required.
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Customer Type</label>
+          <app-custom-select 
+            formControlName="type"
+            [options]="customerTypeOptions"
+            placeholder="Select customer type"
+          ></app-custom-select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Address</label>
+          <input 
+            type="text" 
+            formControlName="address" 
+            placeholder="Enter address" 
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+          >
+          <div *ngIf="editCustomerForm.get('address')?.touched && editCustomerForm.get('address')?.invalid" class="text-xs text-red mt-1">
+            Address is required.
+          </div>
+        </div>
+
+        <div *ngIf="editCustomerForm.get('type')?.value === 'Company'" class="flex items-center space-x-2">
+          <input 
+            type="text" 
+            formControlName="organizationNumber" 
+            placeholder="Enter organization number" 
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+          >
+          <button 
+            type="button" 
+            (click)="searchOrganization()"
+            [disabled]="orgSearchLoading"
+            class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors flex items-center space-x-2"
+          >
+            <span *ngIf="!orgSearchLoading">Search</span>
+            <span *ngIf="orgSearchLoading" class="flex items-center">
+              <svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Searching...
+            </span>
+          </button>
+        </div>
+        <div *ngIf="orgError" class="text-red-500 text-sm mt-1">{{ orgError }}</div>
+
+        <div *ngIf="editCustomerForm.get('type')?.value !== 'Company'" class="flex items-center space-x-2">
+          <input 
+            type="text" 
+            formControlName="socialSecurityNumber" 
+            placeholder="Enter social security number" 
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+          >
+          <button 
+            type="button" 
+            (click)="searchPerson()"
+            [disabled]="personSearchLoading"
+            class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors flex items-center space-x-2"
+          >
+            <span *ngIf="!personSearchLoading">Search</span>
+            <span *ngIf="personSearchLoading" class="flex items-center">
+              <svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Searching...
+            </span>
+          </button>
+        </div>
+        <div *ngIf="personError" class="text-red-500 text-sm mt-1">{{ personError }}</div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Postal Code</label>
+          <input 
+            type="text" 
+            formControlName="postalCode" 
+            placeholder="Enter postal code" 
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+          >
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Location</label>
+          <input 
+            type="text" 
+            formControlName="location" 
+            placeholder="Enter location" 
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+          >
+        </div>
+      </div>
+
+      <div class="flex justify-end mt-4">
+        <button 
+          type="submit" 
+          [disabled]="editCustomerModalLoading" 
+          class="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary-dark transition-colors flex items-center border border-primary/20"
+        >
+          <ng-container *ngIf="!editCustomerModalLoading">
+            Update Customer
+          </ng-container>
+          <ng-container *ngIf="editCustomerModalLoading">
+            <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Updating...
+          </ng-container>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

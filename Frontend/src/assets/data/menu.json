@@ -1,0 +1,18 @@
+[
+    {
+        "route": "/",
+        "resource": "dashboard",
+        "title": "Dashboard",
+        "icon": "",
+        "role": "",
+        "children": [
+            {
+                "route": "",
+                "resource": "",
+                "title": "",
+                "icon": "",
+                "role": ""
+            }
+        ]
+    }
+]

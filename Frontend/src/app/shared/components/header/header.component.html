@@ -1,0 +1,59 @@
+<div class="header-wrapper row m-0">
+  <div class="header-logo-wrapper col-auto p-0">
+    <div class="logo-wrapper">
+      <a routerLink="/"
+        ><img
+          class="img-fluid for-light"
+          src="assets/images/logo/logo.jpeg"
+          alt=""
+          appImageNotFound
+        /><img
+          class="img-fluid for-dark"
+          src="assets/images/logo/logo-dark.png"
+          alt=""
+          appImageNotFound
+      /></a>
+    </div>
+    <div class="toggle-sidebar" (click)="sidebarToggle()">
+      <i
+        class="status_toggle middle"
+        data-feather="align-center"
+        id="sidebar-toggle"
+      ></i>
+    </div>
+  </div>
+  <div class="left-header col horizontal-wrapper ps-0">
+    <app-search></app-search>
+  </div>
+  <div class="nav-right col-6 pull-right right-header p-0">
+    <ul class="nav-menus">
+      <li class="language-nav" (click)="languageToggle()">
+        <app-language></app-language>
+      </li>
+      <li>
+        <div
+          class="mode"
+          (click)="layoutToggle()"
+          [ngClass]="dark ? 'dark-only' : ''"
+        >
+          <app-mode></app-mode>
+        </div>
+      </li>
+      <li class="onhover-dropdown">
+        <app-bookmark></app-bookmark>
+      </li>
+      <li class="onhover-dropdown">
+        <app-notification></app-notification>
+      </li>
+      <li class="onhover-dropdown">
+        <app-message-box></app-message-box>
+      </li>
+      <li class="maximize">
+        <app-maximise></app-maximise>
+      </li>
+      <li class="profile-nav onhover-dropdown p-0 me-0">
+        <app-account></app-account>
+      </li>
+    </ul>
+  </div>
+</div>

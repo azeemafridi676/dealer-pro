@@ -1,0 +1,30 @@
+.app-suggestion {
+    display: inline-block;
+    font-size: 75%;
+    padding: .25em .4em;
+    font-weight: 700;
+    white-space: nowrap;
+    vertical-align: middle;
+    border-radius: .25rem;
+    margin-right: .25em;
+    margin-bottom: .25em;
+    cursor: pointer;
+    opacity: .85;
+    transition: opacity .3s;
+    text-align: center;
+    color: #333;
+  
+    &:hover {
+      opacity: 1;
+    }
+  }
+  
+  @media(max-width: 425px) {
+    .app-suggestion {
+      position: relative;
+      text-align: left;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-right: 20px;
+    }
+  }

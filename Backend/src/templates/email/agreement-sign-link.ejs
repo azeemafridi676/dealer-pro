@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agreement Ready for Signature</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f8f9fa;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .agreement-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        
+        .agreement-info h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .info-value {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        .cta-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: transform 0.2s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .instructions {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        
+        .instructions h4 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .instructions ul {
+            color: #856404;
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 5px;
+        }
+        
+        .attachment-info {
+            background-color: #e8f5e8;
+            border: 1px solid #c3e6cb;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .attachment-info .icon {
+            font-size: 24px;
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+        
+        .attachment-info p {
+            color: #155724;
+            font-weight: 500;
+        }
+        
+        .footer {
+            background-color: #f8f9fa;
+            padding: 25px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .footer p {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .support-contact {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .disclaimer {
+            font-size: 12px;
+            color: #adb5bd;
+            margin-top: 15px;
+            line-height: 1.4;
+        }
+        
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 10px;
+                border-radius: 0;
+            }
+            
+            .content {
+                padding: 25px;
+            }
+            
+            .header {
+                padding: 25px;
+            }
+            
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔒 Agreement Ready for Signature</h1>
+            <p>Your <%= agreementType %> Agreement is ready for digital signature</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <div class="greeting">
+                Hello <%= customerName %>,
+            </div>
+            
+            <p>
+                We hope this email finds you well. Your <%= agreementType %> Agreement has been prepared and is ready for your digital signature.
+            </p>
+            
+            <!-- Agreement Information -->
+            <div class="agreement-info">
+                <h3>📋 Agreement Details</h3>
+                <div class="info-row">
+                    <span class="info-label">Agreement Type:</span>
+                    <span class="info-value"><%= agreementType %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Contract Number:</span>
+                    <span class="info-value"><%= contractNumber %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Contract Date:</span>
+                    <span class="info-value"><%= contractDate %></span>
+                </div>
+                <% if (vehicleRegistration) { %>
+                <div class="info-row">
+                    <span class="info-label">Vehicle Registration:</span>
+                    <span class="info-value"><%= vehicleRegistration %></span>
+                </div>
+                <% } %>
+                <div class="info-row">
+                    <span class="info-label">Status:</span>
+                    <span class="info-value">Awaiting Signature</span>
+                </div>
+            </div>
+            
+            <!-- PDF Attachment Notice -->
+            <div class="attachment-info">
+                <div class="icon">📎</div>
+                <p>The complete agreement is attached as a PDF document for your review.</p>
+            </div>
+            
+            <!-- Call to Action -->
+            <div class="cta-section">
+                <p style="margin-bottom: 20px; color: #6c757d;">
+                    Click the button below to review and digitally sign your agreement:
+                </p>
+                <a href="<%= signLink %>" class="cta-button">
+                    ✍️ Sign Agreement Now
+                </a>
+            </div>
+            
+            <!-- Instructions -->
+            <div class="instructions">
+                <h4>📝 Signing Instructions:</h4>
+                <ul>
+                    <li>Click the "Sign Agreement Now" button above</li>
+                    <li>Review the agreement details carefully</li>
+                    <li>Use BankID for secure digital signature</li>
+                    <li>You'll receive a confirmation once signed</li>
+                </ul>
+            </div>
+            
+            <p style="color: #6c757d; margin-top: 25px;">
+                <strong>Important:</strong> This link is valid for 30 days from the date of this email. 
+                If you need assistance or have any questions about the agreement, please don't hesitate to contact us.
+            </p>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>
+                <strong>Need help?</strong> Contact our support team at 
+                <a href="mailto:support@cardesk.com" class="support-contact">support@cardesk.com</a>
+            </p>
+            <p>
+                Or call us at <span style="font-weight: 500;">+46 123 456 789</span>
+            </p>
+            
+            <div class="disclaimer">
+                This email contains confidential information intended only for <%= customerEmail %>. 
+                If you received this email in error, please delete it and notify us immediately.
+                <br><br>
+                © <%= new Date().getFullYear() %> CarDesk. All rights reserved.
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

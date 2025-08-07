@@ -1,0 +1,266 @@
+<!-- Navbar -->
+<nav [ngClass]="scrolledPastHero ? 'bg-white shadow text-gray-900' : 'bg-transparent'" class="fixed top-0 left-0 w-full z-50 transition-colors duration-300">
+  <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+    <div routerLink="/" [ngClass]="scrolledPastHero ? 'text-gray-900' : 'text-white'" class="text-2xl font-bold cursor-pointer">DealerPro</div>
+    <button class="md:hidden focus:outline-none" (click)="mobileNavOpen = !mobileNavOpen">
+      <svg *ngIf="!mobileNavOpen" class="w-8 h-8" fill="none" [ngClass]="scrolledPastHero ? 'stroke-gray-900' : 'stroke-white'" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <svg *ngIf="mobileNavOpen" class="w-8 h-8" fill="none" [ngClass]="scrolledPastHero ? 'stroke-gray-900' : 'stroke-white'" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <div class="space-x-6 hidden md:flex">
+      <a routerLink="/" fragment="about" [ngClass]="scrolledPastHero ? 'text-gray-900 hover:text-green-700' : 'text-white hover:text-green-300'" class="cursor-pointer">About Us</a>
+      <a routerLink="/" fragment="features" [ngClass]="scrolledPastHero ? 'text-gray-900 hover:text-green-700' : 'text-white hover:text-green-300'" class="cursor-pointer">Features</a>
+      <a routerLink="/" fragment="contact" [ngClass]="scrolledPastHero ? 'text-gray-900 hover:text-green-700' : 'text-white hover:text-green-300'" class="cursor-pointer">Contact</a>
+      <a routerLink="/" fragment="faq" [ngClass]="scrolledPastHero ? 'text-gray-900 hover:text-green-700' : 'text-white hover:text-green-300'" class="cursor-pointer">FAQ</a>
+    </div>
+    <div class="space-x-4 hidden md:flex">
+      <a routerLink="/login" [ngClass]="scrolledPastHero ? 'text-green-900 border-green-700 hover:bg-green-100 hover:text-green-900' : 'text-green-100 border-green-400 hover:bg-green-100 hover:text-green-900'" class="border bg-transparent px-6 py-2 rounded-full transition font-medium">Log in</a>
+      <a routerLink="/sign-up" class="bg-green-200 text-green-900 px-6 py-2 rounded-full hover:bg-green-300 transition font-medium">Create account</a>
+    </div>
+  </div>
+  <!-- Mobile Nav -->
+  <div *ngIf="mobileNavOpen" class="md:hidden bg-white/90 backdrop-blur shadow text-gray-900 px-4 pt-2 pb-4 space-y-4">
+    <a routerLink="/" fragment="about" (click)="mobileNavOpen = false" class="block py-2 px-2 rounded hover:bg-green-100 font-medium">About Us</a>
+    <a routerLink="/" fragment="features" (click)="mobileNavOpen = false" class="block py-2 px-2 rounded hover:bg-green-100 font-medium">Features</a>
+    <a routerLink="/" fragment="contact" (click)="mobileNavOpen = false" class="block py-2 px-2 rounded hover:bg-green-100 font-medium">Contact</a>
+    <a routerLink="/" fragment="faq" (click)="mobileNavOpen = false" class="block py-2 px-2 rounded hover:bg-green-100 font-medium">FAQ</a>
+    <div class="flex flex-col space-y-2 mt-2">
+      <a routerLink="/login" (click)="mobileNavOpen = false" class="border border-green-700 text-green-900 bg-transparent px-6 py-2 rounded-full hover:bg-green-100 hover:text-green-900 transition font-medium">Log in</a>
+      <a routerLink="/sign-up" (click)="mobileNavOpen = false" class="bg-green-900 text-green-200 px-6 py-2 rounded-full hover:bg-green-300 transition font-medium">Create account</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="relative min-h-screen flex items-center bg-gradient-to-b from-[#0a2233] to-[#3ba6b7]">
+  <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+    <div class="md:col-span-7 md:pr-12 order-2 md:order-1 flex flex-col items-center justify-center content-center md:items-start md:justify-start md:content-start">
+      <div class="bg-green-200 text-green-900 px-4 py-2 rounded-full inline-block mb-4 font-semibold text-lg">Best for Car Dealers 2025</div>
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-white leading-tight text-center md:text-left">Modernize your car dealership<br>with smart CRM</h1>
+      <div class="space-y-3 mb-8">
+        <div *ngFor="let subtitle of heroSubtitle" class="flex items-center space-x-3 text-white text-lg sm:text-xl">
+          <svg class="w-6 h-6 text-green-200" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+          <span>{{ subtitle }}</span>
+        </div>
+      </div>
+      <button class="bg-green-200 text-green-900 px-8 py-3 rounded-full text-lg sm:text-xl font-semibold shadow hover:bg-green-300 transition">Get Started</button>
+    </div>
+    <div class="md:col-span-5 relative flex justify-center order-1 md:order-2 mb-8 md:mb-0">
+      <img src="https://plus.unsplash.com/premium_photo-1661384343027-050e0ecf393b?q=80&w=2600&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Hero Car" class="hidden md:block absolute bg-white rounded-lg shadow-lg transform -rotate-12 -left-8 sm:-left-16 md:-left-24 top-12 sm:top-20 md:top-24 z-20 w-40 sm:w-52 md:w-60 h-56 sm:h-72 md:h-80 object-cover p-1" />
+      <img src="https://plus.unsplash.com/premium_photo-1661277623135-224e67c9ff81?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGNhciUyMGRlYWxlcnxlbnwwfHwwfHx8MA%3D%3D" alt="Dealership Showroom" class="bg-white p-1 rounded-lg shadow-lg z-10 relative w-full h-60 sm:h-80 md:h-96 object-cover" />
+    </div>
+  </div>
+</section>
+
+<!-- About Us Section -->
+<section class="bg-white py-16 sm:py-24" id="about">
+  <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+    <div class="md:col-span-6 flex justify-center mb-8 md:mb-0">
+      <img src="https://images.unsplash.com/photo-1461632830798-3adb3034e4c8?auto=format&fit=crop&w=800&q=80" alt="About Us Team" class="bg-gray-200 rounded-xl w-full max-w-[400px] sm:max-w-[600px] h-64 sm:h-[400px] object-cover" />
+    </div>
+    <div class="md:col-span-6">
+      <h2 class="text-3xl sm:text-4xl font-bold mb-6">About Us</h2>
+      <p class="text-gray-600 text-lg sm:text-xl leading-relaxed">
+        We specialize in CRM solutions for car dealers. With over 10 years of experience, we have helped hundreds of dealerships increase their sales and streamline their operations. Our platform is designed to meet the unique needs of the automotive industry.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="bg-gray-100 py-12 sm:py-16 border-t">
+  <div class="container mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+    <div>
+      <div class="text-3xl sm:text-5xl font-bold text-gray-800 mb-2">1000+</div>
+      <div class="text-base sm:text-xl text-gray-500">Satisfied Customers</div>
+    </div>
+    <div>
+      <div class="text-3xl sm:text-5xl font-bold text-gray-800 mb-2">+35%</div>
+      <div class="text-base sm:text-xl text-gray-500">Increased Sales</div>
+    </div>
+    <div>
+      <div class="text-3xl sm:text-5xl font-bold text-gray-800 mb-2">24/7</div>
+      <div class="text-base sm:text-xl text-gray-500">Support</div>
+    </div>
+    <div>
+      <div class="text-3xl sm:text-5xl font-bold text-gray-800 mb-2">99.9%</div>
+      <div class="text-base sm:text-xl text-gray-500">Uptime</div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="bg-white py-16 sm:py-24" id="features">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl sm:text-5xl font-bold text-center mb-8 sm:mb-12">Features</h2>
+    <div class="flex justify-center mb-8 sm:mb-10">
+      <div class="flex flex-wrap gap-4 sm:space-x-8 justify-center">
+        <button *ngFor="let tab of featureTabs; let i = index"
+                (click)="activeFeatureTab = i"
+                [ngClass]="activeFeatureTab === i ? 'bg-gray-800 text-white' : 'bg-transparent text-gray-700'"
+                class="px-4 sm:px-6 py-2 rounded-full font-medium text-base sm:text-lg focus:outline-none transition border border-gray-200 mb-2 sm:mb-0"
+        >
+          {{ tab.label }}
+        </button>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+      <div class="md:col-span-7">
+        <h3 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">{{ featureTabs[activeFeatureTab].title }}</h3>
+        <p class="text-gray-600 text-base sm:text-lg mb-4 sm:mb-6">{{ featureTabs[activeFeatureTab].description }}</p>
+        <ul class="list-disc pl-6 space-y-2 sm:space-y-4 text-gray-700 text-base sm:text-lg">
+          <li *ngFor="let point of featureTabs[activeFeatureTab].points">{{ point }}</li>
+        </ul>
+      </div>
+      <div class="md:col-span-5 flex justify-center mt-8 md:mt-0">
+        <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80" alt="Feature Highlight" class="bg-gray-200 rounded-xl w-full max-w-[400px] sm:max-w-[600px] h-64 sm:h-[400px] object-cover" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="bg-gray-100 py-16 sm:py-24">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl sm:text-5xl font-bold text-center mb-10 sm:mb-16">What our customers say</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="bg-white rounded-2xl shadow p-6 sm:p-8 flex flex-col items-start">
+        <div class="flex items-center mb-4">
+          <div class="bg-gray-200 rounded-full w-12 h-12 sm:w-[60px] sm:h-[60px] flex items-center justify-center mr-4">
+            <span class="text-gray-700 text-lg sm:text-xl font-bold">AA</span>
+          </div>
+          <div>
+            <div class="font-bold text-lg sm:text-xl">Anna Anderson</div>
+            <div class="text-gray-500 text-base sm:text-lg">CEO, Carhouse AB</div>
+          </div>
+        </div>
+        <div class="text-gray-600 text-base sm:text-lg">The CRM system has revolutionized our way of working with leads. Fantastic tool!</div>
+      </div>
+      <div class="bg-white rounded-2xl shadow p-6 sm:p-8 flex flex-col items-start">
+        <div class="flex items-center mb-4">
+          <div class="bg-gray-200 rounded-full w-12 h-12 sm:w-[60px] sm:h-[60px] flex items-center justify-center mr-4">
+            <span class="text-gray-700 text-lg sm:text-xl font-bold">ES</span>
+          </div>
+          <div>
+            <div class="font-bold text-lg sm:text-xl">Eric Svensson</div>
+            <div class="text-gray-500 text-base sm:text-lg">Sales Manager, Motors AB</div>
+          </div>
+        </div>
+        <div class="text-gray-600 text-base sm:text-lg">We have increased our sales by 35% since we started using the system.</div>
+      </div>
+      <div class="bg-white rounded-2xl shadow p-6 sm:p-8 flex flex-col items-start">
+        <div class="flex items-center mb-4">
+          <div class="bg-gray-200 rounded-full w-12 h-12 sm:w-[60px] sm:h-[60px] flex items-center justify-center mr-4">
+            <span class="text-gray-700 text-lg sm:text-xl font-bold">MN</span>
+          </div>
+          <div>
+            <div class="font-bold text-lg sm:text-xl">Maria Nilsson</div>
+            <div class="text-gray-500 text-base sm:text-lg">Marketing Manager, Auto Group</div>
+          </div>
+        </div>
+        <div class="text-gray-600 text-base sm:text-lg">Best CRM system we've tested. Perfect for car dealers.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How it works Section -->
+<section class="bg-white py-16 sm:py-24">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl sm:text-5xl font-bold text-center mb-10 sm:mb-16">How it works?</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 text-center">
+      <div>
+        <div class="mx-auto mb-4 sm:mb-6 w-20 h-20 sm:w-32 sm:h-32 rounded-full bg-gray-800 flex items-center justify-center">
+          <span class="text-white text-2xl sm:text-4xl font-bold">1</span>
+        </div>
+        <div class="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Register Account</div>
+        <div class="text-gray-500 text-base sm:text-lg">Get started in less than 2 minutes</div>
+      </div>
+      <div>
+        <div class="mx-auto mb-4 sm:mb-6 w-20 h-20 sm:w-32 sm:h-32 rounded-full bg-gray-800 flex items-center justify-center">
+          <span class="text-white text-2xl sm:text-4xl font-bold">2</span>
+        </div>
+        <div class="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Customize System</div>
+        <div class="text-gray-500 text-base sm:text-lg">Tailor to your needs</div>
+      </div>
+      <div>
+        <div class="mx-auto mb-4 sm:mb-6 w-20 h-20 sm:w-32 sm:h-32 rounded-full bg-gray-800 flex items-center justify-center">
+          <span class="text-white text-2xl sm:text-4xl font-bold">3</span>
+        </div>
+        <div class="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Import Data</div>
+        <div class="text-gray-500 text-base sm:text-lg">Easily transfer your data</div>
+      </div>
+      <div>
+        <div class="mx-auto mb-4 sm:mb-6 w-20 h-20 sm:w-32 sm:h-32 rounded-full bg-gray-800 flex items-center justify-center">
+          <span class="text-white text-2xl sm:text-4xl font-bold">4</span>
+        </div>
+        <div class="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">Start Selling</div>
+        <div class="text-gray-500 text-base sm:text-lg">Increase your sales instantly</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="bg-gray-100 py-16 sm:py-24" id="faq">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl sm:text-5xl font-bold text-center mb-10 sm:mb-16">Frequently Asked Questions</h2>
+    <div class="max-w-2xl mx-auto space-y-4 sm:space-y-6">
+      <div *ngFor="let faq of faqs; let i = index" class="bg-white rounded-xl shadow flex flex-col">
+        <button (click)="toggleFaq(i)" class="flex justify-between items-center w-full px-4 sm:px-8 py-4 sm:py-6 text-lg sm:text-xl font-medium focus:outline-none">
+          <span>{{ faq.question }}</span>
+          <svg [ngClass]="{'transform rotate-180': openFaq === i}" class="w-6 h-6 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div *ngIf="openFaq === i" class="px-4 sm:px-8 pb-4 sm:pb-6 text-gray-600 text-base sm:text-lg animate-fade-in">
+          {{ faq.answer }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="bg-white py-16 sm:py-24" id="contact">
+  <div class="container mx-auto px-4 flex flex-col items-center">
+    <h2 class="text-3xl sm:text-5xl font-bold text-center mb-2 sm:mb-4">Ready to get started?</h2>
+    <p class="text-lg sm:text-xl text-gray-700 mb-6 sm:mb-10 text-center">Modernize your car dealership today</p>
+    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 w-full sm:w-auto justify-center">
+      <button routerLink="/sign-up" class="bg-gray-800 text-white text-lg sm:text-2xl px-6 sm:px-10 py-3 sm:py-4 rounded-full font-medium shadow hover:bg-gray-900 transition w-full sm:w-auto">Create Account</button>
+      <button class="border-2 border-gray-800 text-gray-800 text-lg sm:text-2xl px-6 sm:px-10 py-3 sm:py-4 rounded-full font-medium hover:bg-gray-100 transition w-full sm:w-auto">Contact Us</button>
+    </div>
+  </div>
+</section>
+
+<!-- Footer Section -->
+<footer class="bg-[#20434a] text-white pt-10 sm:pt-16 pb-6 sm:pb-8">
+  <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 mb-6 sm:mb-8">
+    <div>
+      <div class="text-2xl font-bold mb-2 sm:mb-4">DealerPro</div>
+      <div class="text-base sm:text-lg">Sweden's leading CRM system for car dealers</div>
+    </div>
+    <div>
+      <div class="font-bold text-lg sm:text-xl mb-2 sm:mb-4">Navigation</div>
+      <ul class="space-y-1 sm:space-y-2 text-base sm:text-lg">
+        <li><a routerLink="/" fragment="about" class="hover:underline cursor-pointer">About Us</a></li>
+        <li><a routerLink="/" fragment="features" class="hover:underline cursor-pointer">Features</a></li>
+        <li><a routerLink="/" fragment="contact" class="hover:underline cursor-pointer">Contact</a></li>
+        <li><a routerLink="/" fragment="faq" class="hover:underline cursor-pointer">FAQ</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="font-bold text-lg sm:text-xl mb-2 sm:mb-4">Contact</div>
+      <div class="text-base sm:text-lg">info&#64;bilcrm.se</div>
+      <div class="text-base sm:text-lg">08-123 45 678</div>
+    </div>
+  </div>
+  <div class="border-t border-[#2e5a62] pt-4 sm:pt-6 text-center text-gray-300 text-base sm:text-lg">
+    © 2024 BilCRM. All rights reserved.
+  </div>
+</footer>

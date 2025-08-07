@@ -1,0 +1,43 @@
+<div class="custom-select-wrapper" [class.disabled]="disabled">
+  <div 
+    class="custom-select-trigger"
+    (click)="toggleDropdown()"
+    [class.active]="isDropdownOpen"
+  >
+    <i class="ri-arrow-down-s-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+    <span class="select-text">
+      {{ selectedOption?.label || placeholder }}
+    </span>
+    <svg 
+      class="select-arrow" 
+      [class.rotated]="isDropdownOpen"
+      xmlns="http://www.w3.org/2000/svg" 
+      width="20" 
+      height="20" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      stroke-width="2" 
+      stroke-linecap="round" 
+      stroke-linejoin="round"
+    >
+      <path d="m6 9 6 6 6-6"></path>
+    </svg>
+  </div>
+  
+  <div 
+    class="custom-select-dropdown" 
+    [class.show]="isDropdownOpen"
+  >
+    <div class="select-options-container">
+      <div 
+        *ngFor="let option of options" 
+        class="select-option"
+        [class.selected]="option.value === selectedOption?.value"
+        (click)="selectOption(option)"
+      >
+        <span>{{ option.label }}</span>
+      </div>
+    </div>
+  </div>
+</div>

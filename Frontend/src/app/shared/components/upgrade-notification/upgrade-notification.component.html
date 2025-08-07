@@ -1,0 +1,24 @@
+<div *ngIf="show" [@slideDown] class="fixed top-0 left-0 right-0 z-50">
+  <div class="bg-gradient-to-r from-[#eb7641] to-[#d66937] text-white py-3 px-4 shadow-lg">
+    <div class="container mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <i class="ri-arrow-up-circle-line text-2xl"></i>
+        <div>
+          <p class="font-medium">Upgrade Required for {{ feature }}</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-4">
+        <button 
+          class="bg-white text-indigo-800  px-4 py-2 rounded-lg font-medium hover:bg-opacity-90 transition-colors duration-300"
+          routerLink="/dashboard/subscriptions">
+          Upgrade Now
+        </button>
+        <button 
+          (click)="close()" 
+          class="text-white hover:text-opacity-80 transition-colors duration-300">
+          <i class="ri-close-line text-xl"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

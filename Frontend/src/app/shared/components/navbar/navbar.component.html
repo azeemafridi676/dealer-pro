@@ -1,0 +1,179 @@
+<!-- Top Navbar -->
+
+<nav
+    class="fixed top-0 left-0 right-0 z-40 bg-white backdrop-blur-sm shadow-sm px-6 dark:bg-gray-900/90 border-b border-gray-200 dark:border-gray-700">
+    <div class="w-full flex flex-wrap items-center justify-between mx-auto py-3">
+        <!-- Logo and Company Name -->
+        <div class="flex items-center cursor-pointer" routerLink="/">
+            <ng-container *ngIf="userData?.logo; else textLogo">
+                <img [src]="userData.logo" alt="Company Logo" class="h-8 w-auto">
+            </ng-container>
+            <ng-template #textLogo>
+                <span class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-wide [text-shadow:_0_1px_0_rgb(0_0_0_/_40%)]">DealerPro</span>
+            </ng-template>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <div class="hidden md:flex items-center space-x-1">
+            <ng-container *ngFor="let resource of resources">
+                <!-- Main Resource with Sub-resources -->
+                <div *ngIf="hasPermission(resource.resource_id, 'read') && (!resource.has_subresources || hasAnyVisibleSubResource(resource))" class="relative group">
+                    <button *ngIf="resource.has_subresources"
+                        [ngClass]="{'bg-primary text-white': currentRoute.startsWith(resource.route),'hover:bg-gray-100 dark:hover:bg-gray-700': !currentRoute.startsWith(resource.route)}"
+                        class="flex items-center px-4 py-[0.6rem] rounded-md text-sm font-light text-gray-700 dark:text-gray-300"
+                        (click)="navigateToResource(resource)">
+                        <i class="{{resource.icon}} w-5 h-5 mr-2"
+                            [ngClass]="currentRoute.startsWith(resource.route) ? 'text-white' : 'text-gray-500 dark:text-gray-400'"></i>
+                        <span>{{resource.title}}</span>
+                        <i class="ri-arrow-down-s-line ml-1"></i>
+                    </button>
+                    
+                    <!-- Sub-resources Dropdown -->
+                    <div *ngIf="resource.has_subresources"
+                        class="absolute left-0 mt-1 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                        <div class="py-1">
+                            <ng-container *ngFor="let subResource of resource.subresources">
+                                <a *ngIf="hasSubResourcePermission(subResource)"
+                                    [routerLink]="subResource.route"
+                                    [ngClass]="{'bg-primary text-white': currentRoute === subResource.route}"
+                                    class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <i class="{{subResource.icon}} w-5 h-5 mr-2"
+                                        [ngClass]="currentRoute === subResource.route ? 'text-white' : 'text-gray-500 dark:text-gray-400'"></i>
+                                    <span>{{subResource.title}}</span>
+                                </a>
+                            </ng-container>
+                        </div>
+                    </div>
+
+                    <!-- Regular Resource Link -->
+                    <a *ngIf="!resource.has_subresources"
+                        [routerLink]="resource.route"
+                        [ngClass]="{'bg-primary text-white': currentRoute === resource.route,'hover:bg-gray-100 dark:hover:bg-gray-700': currentRoute !== resource.route}"
+                        class="flex items-center px-4 py-[0.6rem] rounded-md text-sm font-light text-gray-700 dark:text-gray-300">
+                        <i class="{{resource.icon}} w-5 h-5 mr-2"
+                            [ngClass]="currentRoute === resource.route ? 'text-white' : 'text-gray-500 dark:text-gray-400'"></i>
+                        <span>{{resource.title}}</span>
+                    </a>
+                </div>
+            </ng-container>
+        </div>
+
+        <!-- Profile Section -->
+        <div class="flex items-center space-x-2">
+
+            <button id="user-menu-button" (click)="toggleProfileMenu($event)"
+                class="flex items-center space-x-3 p-2 rounded-full transition-all duration-200">
+                <div class="w-10 h-10 rounded-full bg-[#e7edfa] flex items-center justify-center">
+                    <span class="text-black font-medium text-base">{{userData?.first_name?.charAt(0) ||
+                        ''}}{{userData?.last_name?.charAt(0) || ''}}</span>
+                </div>
+                <div class="text-left hidden sm:block">
+                    <p class="text-sm font-medium text-primary truncate max-w-[120px]">{{userData?.first_name}}
+                        {{userData?.last_name}}</p>
+                    <!-- <p class="text-xs text-gray-500 truncate max-w-[120px]">{{userData?.email}}</p> -->
+                </div>
+                <i class="ri-arrow-down-s-line text-primary/60" [class.rotate-180]="isProfileMenuOpen"
+                    class="transition-transform duration-200"></i>
+            </button>
+
+            <!-- Profile Dropdown -->
+            <div *ngIf="isProfileMenuOpen"
+                class="absolute bg-white right-4 top-14 z-50 my-4 w-56 text-base list-none  backdrop-blur-sm rounded divide-y divide-gray-100 shadow-sm dark:bg-gray-700/90 dark:divide-gray-600">
+                <div class="py-3 px-4">
+                    <span class="block text-sm text-gray-900 dark:text-white">{{userData.first_name || 'Michael'}}
+                        {{userData.last_name || 'Robinson'}}</span>
+                    <span class="block text-sm font-light text-gray-500 truncate dark:text-gray-400">{{userData.email ||
+                        'michael.robin@gmail.com'}}</span>
+                </div>
+                <ul class="py-1" aria-labelledby="user-menu-button">
+                    <ng-container *ngIf="getAllFilteredResources() | async as filteredResources">
+                        <ng-container *ngIf="filteredResources.length > 0;">
+                            <ng-container *ngFor="let resource of filteredResources">
+                                <li>
+                                    <a [routerLink]="resource.route" (click)="isProfileMenuOpen = false"
+                                        class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+                                        {{resource.title}}
+                                    </a>
+                                </li>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                    <li>
+                        <a routerLink="/dashboard/profile" (click)="isProfileMenuOpen = false"
+                            class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Profile</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" (click)="logout()"
+                            class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Sign
+                            out</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Mobile menu button -->
+            <button type="button"
+                class="inline-flex items-center p-2 w-10 h-10 justify-center text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                (click)="toggleMobileMenu()">
+                <span class="sr-only">Open main menu</span>
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 17 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M1 1h15M1 7h15M1 13h15" />
+                </svg>
+            </button>
+        </div>
+       
+    </div>
+</nav>
+
+<!-- Mobile menu dropdown -->
+<div class="md:hidden" *ngIf="isMobileMenuOpen">
+    <div
+        class="fixed left-0 right-0 top-16 z-30 bg-white/90 backdrop-blur-sm dark:bg-gray-900/90 border-t border-gray-200 dark:border-gray-700 py-2 shadow-sm">
+        <ul class="space-y-2 font-light px-6">
+            <ng-container *ngFor="let resource of resources">
+                <li *ngIf="hasPermission(resource.resource_id, 'read') && (!resource.has_subresources || hasAnyVisibleSubResource(resource))">
+                    <!-- Main Resource with Sub-resources -->
+                    <div *ngIf="resource.has_subresources">
+                        <button (click)="navigateToResource(resource)"
+                            [ngClass]="{'bg-primary text-white': currentRoute.startsWith(resource.route)}"
+                            class="w-full flex items-center justify-between p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <div class="flex items-center">
+                                <i class="{{resource.icon}} w-5 h-5"
+                                    [ngClass]="currentRoute.startsWith(resource.route) ? 'text-white' : 'text-gray-500 dark:text-gray-400'"></i>
+                                <span class="ms-3">{{resource.title}}</span>
+                            </div>
+                            <i class="ri-arrow-down-s-line" [class.rotate-180]="activeDropdown === resource.resource_id"></i>
+                        </button>
+                        
+                        <!-- Sub-resources in Mobile -->
+                        <div *ngIf="activeDropdown === resource.resource_id" class="pl-4 mt-2 space-y-2">
+                            <ng-container *ngFor="let subResource of resource.subresources">
+                                <a *ngIf="hasSubResourcePermission(subResource)"
+                                    [routerLink]="subResource.route"
+                                    [ngClass]="{'bg-primary text-white': currentRoute === subResource.route}"
+                                    class="flex items-center p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    (click)="closeMobileMenu()">
+                                    <i class="{{subResource.icon}} w-5 h-5"
+                                        [ngClass]="currentRoute === subResource.route ? 'text-white' : 'text-gray-500 dark:text-gray-400'"></i>
+                                    <span class="ms-3">{{subResource.title}}</span>
+                                </a>
+                            </ng-container>
+                        </div>
+                    </div>
+
+                    <!-- Regular Resource Link -->
+                    <a *ngIf="!resource.has_subresources"
+                        [routerLink]="resource.route"
+                        [ngClass]="{'bg-primary text-white': currentRoute === resource.route}"
+                        class="flex items-center p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        (click)="closeMobileMenu()">
+                        <i class="{{resource.icon}} w-5 h-5"
+                            [ngClass]="currentRoute === resource.route ? 'text-white' : 'text-gray-500 dark:text-gray-400'"></i>
+                        <span class="ms-3">{{resource.title}}</span>
+                    </a>
+                </li>
+            </ng-container>
+        </ul>
+    </div>
+</div>

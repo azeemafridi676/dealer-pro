@@ -1,0 +1,402 @@
+<div class="min-h-screen py-8 px-0">
+  <!-- Header -->
+  <div class=" mx-auto mb-6 flex items-center justify-between">
+    <button class="flex items-center gap-2 text-gray-500 hover:text-primary font-medium text-base bg-transparent border-none p-0" (click)="goBack()">
+      <i class="ri-arrow-left-line text-xl"></i> Back
+    </button>
+  </div>
+
+  <div class=" mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+    <!-- Left: Form -->
+    <div class="bg-white rounded-2xl shadow p-8">
+      <h2 class="text-2xl font-bold mb-6">Create Receipt</h2>
+      
+      <form [formGroup]="invoiceForm" autocomplete="off">
+        <!-- Organization and Customer Section -->
+        <div class="font-semibold text-lg mb-4 mt-2">Organization & Customer Information</div>
+        <div class="mb-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Organization Number -->
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Organization Number <span class="text-red">*</span></label>
+            <div class="flex items-center gap-2">
+              <input 
+                type="text" 
+                formControlName="organizationNumber"
+                placeholder="Enter organization number (XXXXXX-XXXX)"
+                class="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+                [ngClass]="{'border-red': invoiceForm.get('organizationNumber')?.invalid && invoiceForm.get('organizationNumber')?.touched}"
+              />
+              <button
+                type="button"
+                (click)="onOrgSearch()"
+                [disabled]="orgSearchLoading || invoiceForm.get('organizationNumber')?.invalid"
+                class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition flex items-center gap-2"
+              >
+                <svg *ngIf="orgSearchLoading" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Search
+              </button>
+            </div>
+            <div *ngIf="invoiceForm.get('organizationNumber')?.invalid && invoiceForm.get('organizationNumber')?.touched" class="text-red text-sm mt-1">
+              <div *ngIf="invoiceForm.get('organizationNumber')?.errors?.['required']">Organization number is required</div>
+              <div *ngIf="invoiceForm.get('organizationNumber')?.errors?.['pattern']">Invalid organization number format</div>
+              <div *ngIf="invoiceForm.get('organizationNumber')?.errors?.['whitespace']">Organization number cannot be just whitespace</div>
+            </div>
+          </div>
+          <!-- Customer Number -->
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Customer Number <span class="text-red">*</span></label>
+            <div class="flex items-center gap-2">
+              <input 
+                type="text" 
+                formControlName="customerNumber"
+                placeholder="Customer number"
+                class="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+                [ngClass]="{'border-red': invoiceForm.get('customerNumber')?.invalid && invoiceForm.get('customerNumber')?.touched}"
+              />
+              <button
+                type="button"
+                (click)="searchCustomer()"
+                [disabled]="customerSearchLoading || invoiceForm.get('customerNumber')?.invalid"
+                class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition flex items-center gap-2"
+              >
+                <svg *ngIf="customerSearchLoading" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Search
+              </button>
+            </div>
+            <div *ngIf="invoiceForm.get('customerNumber')?.invalid && invoiceForm.get('customerNumber')?.touched" class="text-red text-sm mt-1">
+              <div *ngIf="invoiceForm.get('customerNumber')?.errors?.['required']">Customer number is required</div>
+              <div *ngIf="invoiceForm.get('customerNumber')?.errors?.['minlength']">Customer number must be at least 3 characters</div>
+              <div *ngIf="invoiceForm.get('customerNumber')?.errors?.['maxlength']">Customer number cannot exceed 20 characters</div>
+              <div *ngIf="invoiceForm.get('customerNumber')?.errors?.['pattern']">Customer number can only contain letters, numbers, hyphens, and underscores</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Customer Type -->
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Customer Type <span class="text-red">*</span></label>
+            <select 
+              formControlName="customerType"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+              [ngClass]="{'border-red': invoiceForm.get('customerType')?.invalid && invoiceForm.get('customerType')?.touched}"
+            >
+              <option disabled>Select a customer type</option>
+              <option value="Company">Company</option>
+              <option value="Private Individual">Private Individual</option>
+            </select>
+            <div *ngIf="invoiceForm.get('customerType')?.invalid && invoiceForm.get('customerType')?.touched" class="text-red text-sm mt-1">
+              <div *ngIf="invoiceForm.get('customerType')?.errors?.['required']">Customer type is required</div>
+            </div>
+          </div>
+          <!-- Contact Person -->
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Contact Person</label>
+            <input 
+              type="text" 
+              formControlName="contactPerson"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+            />
+          </div>
+        </div>
+
+        <!-- Contact Information Section -->
+        <div class="font-semibold text-lg mb-4 mt-8">Contact Information</div>
+        <div class="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Email -->
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Email <span class="text-red">*</span></label>
+            <input 
+              type="email" 
+              formControlName="email"
+              placeholder="email@example.com"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+              [ngClass]="{'border-red': invoiceForm.get('email')?.invalid && invoiceForm.get('email')?.touched}"
+            />
+            <div *ngIf="invoiceForm.get('email')?.invalid && invoiceForm.get('email')?.touched" class="text-red text-sm mt-1">
+              <div *ngIf="invoiceForm.get('email')?.errors?.['required']">Email is required</div>
+              <div *ngIf="invoiceForm.get('email')?.errors?.['email'] || invoiceForm.get('email')?.errors?.['invalidEmail']">Invalid email format</div>
+              <div *ngIf="invoiceForm.get('email')?.errors?.['maxlength']">Email cannot exceed 100 characters</div>
+            </div>
+          </div>
+          <!-- Telephone Number -->
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Telephone Number <span class="text-red">*</span></label>
+            <input 
+              type="tel" 
+              formControlName="telephoneNumber"
+              placeholder="070-123 45 67"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+              [ngClass]="{'border-red': invoiceForm.get('telephoneNumber')?.invalid && invoiceForm.get('telephoneNumber')?.touched}"
+            />
+            <div *ngIf="invoiceForm.get('telephoneNumber')?.invalid && invoiceForm.get('telephoneNumber')?.touched" class="text-red text-sm mt-1">
+              <div *ngIf="invoiceForm.get('telephoneNumber')?.errors?.['required']">Telephone number is required</div>
+              <div *ngIf="invoiceForm.get('telephoneNumber')?.errors?.['pattern'] || invoiceForm.get('telephoneNumber')?.errors?.['invalidPhone']">
+                Invalid telephone number format. Use 10-15 digits.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Date Information Section -->
+        <div class="font-semibold text-lg mb-4 mt-8">Date Information</div>
+        <div class="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Receipt Date -->
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Receipt Date <span class="text-red">*</span></label>
+            <input 
+              type="date" 
+              formControlName="receiptDate"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+              [ngClass]="{'border-red': invoiceForm.get('receiptDate')?.invalid && invoiceForm.get('receiptDate')?.touched}"
+            />
+            <div *ngIf="invoiceForm.get('receiptDate')?.invalid && invoiceForm.get('receiptDate')?.touched" class="text-red text-sm mt-1">
+              <div *ngIf="invoiceForm.get('receiptDate')?.errors?.['required']">Receipt date is required</div>
+              <div *ngIf="invoiceForm.get('receiptDate')?.errors?.['invalidDate']">Invalid date</div>
+            </div>
+          </div>
+          <!-- Due Date -->
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Due Date <span class="text-red">*</span></label>
+            <input 
+              type="date" 
+              formControlName="dueDate"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+              [ngClass]="{'border-red': invoiceForm.get('dueDate')?.invalid && invoiceForm.get('dueDate')?.touched}"
+            />
+            <div *ngIf="invoiceForm.get('dueDate')?.invalid && invoiceForm.get('dueDate')?.touched" class="text-red text-sm mt-1">
+              <div *ngIf="invoiceForm.get('dueDate')?.errors?.['required']">Due date is required</div>
+              <div *ngIf="invoiceForm.get('dueDate')?.errors?.['invalidDueDate']">Due date must be after or equal to receipt date</div>
+              <div *ngIf="invoiceForm.get('dueDate')?.errors?.['maxDateExceeded']">Due date cannot be more than a year in the future</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Item Details Section -->
+        <div class="font-semibold text-lg mb-4 mt-8">Item Details</div>
+        <div class="mb-8">
+          <div class="border rounded-lg overflow-x-auto">
+            <table class="w-full min-w-[700px]">
+              <thead>
+                <tr class="border-b bg-gray-50">
+                  <th class="py-2 px-3 text-left text-sm font-medium text-gray-600">Product / service</th>
+                  <th class="py-2 px-3 text-right text-sm font-medium text-gray-600">Number</th>
+                  <th class="py-2 px-3 text-right text-sm font-medium text-gray-600">Unit</th>
+                  <th class="py-2 px-3 text-right text-sm font-medium text-gray-600">Price excl. VAT</th>
+                  <th class="py-2 px-3 text-right text-sm font-medium text-gray-600">Moms</th>
+                  <th class="py-2 px-3 text-right text-sm font-medium text-gray-600">Amount</th>
+                  <th class="py-2 px-3 text-right text-sm font-medium text-gray-600">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of invoiceItems.controls; let i = index" class="border-b">
+                  <td class="py-2 px-3">
+                    <input 
+                      type="text" 
+                      [formControl]="getFormControl(item, 'product')"
+                      class="w-20 text-right px-2 py-1 border border-gray-200 rounded-md text-sm"
+                      [ngClass]="{'border-red': getFormControl(item, 'product').invalid && getFormControl(item, 'product').touched}"
+                    >
+                    <div *ngIf="getFormControl(item, 'product').invalid && getFormControl(item, 'product').touched" class="text-red text-xs mt-1">
+                      <div *ngIf="getFormControl(item, 'product').errors?.['required']">Product name is required</div>
+                    </div>
+                  </td>
+                  <td class="py-2 px-3 text-right">
+                    <input 
+                      type="number" 
+                      [formControl]="getFormControl(item, 'number')"
+                      class="w-20 text-right px-2 py-1 border border-gray-200 rounded-md text-sm"
+                      [ngClass]="{'border-red': getFormControl(item, 'number').invalid && getFormControl(item, 'number').touched}"
+                    >
+                    <div *ngIf="getFormControl(item, 'number').invalid && getFormControl(item, 'number').touched" class="text-red text-xs mt-1">
+                      <div *ngIf="getFormControl(item, 'number').errors?.['required']">Number is required</div>
+                      <div *ngIf="getFormControl(item, 'number').errors?.['min']">Number must be greater than 0</div>
+                    </div>
+                  </td>
+                  <td class="py-2 px-3 text-right">
+                    <input 
+                      type="text" 
+                      [formControl]="getFormControl(item, 'unit')"
+                      class="w-20 text-right px-2 py-1 border border-gray-200 rounded-md text-sm"
+                    >
+                  </td>
+                  <td class="py-2 px-3 text-right">
+                    <input 
+                      type="number" 
+                      [formControl]="getFormControl(item, 'priceExclVAT')"
+                      class="w-24 text-right px-2 py-1 border border-gray-200 rounded-md text-sm"
+                      [ngClass]="{'border-red': getFormControl(item, 'priceExclVAT').invalid && getFormControl(item, 'priceExclVAT').touched}"
+                    >
+                    <div *ngIf="getFormControl(item, 'priceExclVAT').invalid && getFormControl(item, 'priceExclVAT').touched" class="text-red-600 text-xs mt-1">
+                      <div *ngIf="getFormControl(item, 'priceExclVAT').errors?.['required']">Price is required</div>
+                      <div *ngIf="getFormControl(item, 'priceExclVAT').errors?.['min']">Price must be greater than 0</div>
+                      <div *ngIf="getFormControl(item, 'priceExclVAT').errors?.['max']">Price is too high</div>
+                    </div>
+                  </td>
+                  <td class="py-2 px-3 text-right">
+                    <select 
+                      [formControl]="getFormControl(item, 'vatRate')"
+                      class="w-20 text-right px-2 py-1 border border-gray-200 rounded-md text-sm"
+                    >
+                      <option *ngFor="let rate of vatRates" [value]="rate.value">
+                        {{ rate.label }}
+                      </option>
+                    </select>
+                  </td>
+                  <td class="py-2 px-3 text-right">
+                    {{ item.get('amount')?.value | number:'1.2-2' }}
+                  </td>
+                  <td class="py-2 px-3 text-right">
+                    <button 
+                      [disabled]="invoiceItems.length === 1"
+                      [class.cursor-not-allowed]="invoiceItems.length === 1"
+                      (click)="removeInvoiceItem(i)"
+                      class="text-primary text-sm"
+                    >
+                      <i class="ri-delete-bin-line"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div *ngIf="invoiceForm.get('invoiceItems')?.errors?.['noValidProduct']" class="p-4 bg-red-50 text-red-600 text-sm">
+              At least one valid product is required. Please add a product with a name, quantity, and price.
+            </div>
+            <div class="p-4 flex justify-between items-center border-t">
+              <div class="flex space-x-4">
+                <button 
+                  (click)="addInvoiceItem()"
+                  class="text-blue-500 hover:underline flex items-center text-sm"
+                >
+                  <i class="ri-add-line mr-1"></i> Add new row
+                </button>
+                <button 
+                  (click)="addProductLine()"
+                  class="text-blue-500 hover:underline flex items-center text-sm"
+                >
+                  Add new product line
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Totals Summary -->
+          <div class="mt-4 bg-gray-50 rounded-lg p-4">
+            <div class="grid grid-cols-2 gap-2 max-w-xs ml-auto">
+              <div class="text-right text-sm text-gray-600">Net:</div>
+              <div class="text-right text-sm">{{ calculateTotals().net | number:'1.2-2' }} SEK</div>
+              <div class="text-right text-sm text-gray-600">VAT:</div>
+              <div class="text-right text-sm">{{ calculateTotals().vat | number:'1.2-2' }} SEK</div>
+              <div class="text-right text-sm font-semibold border-t pt-2">Total:</div>
+              <div class="text-right text-sm font-semibold border-t pt-2">{{ calculateTotals().total | number:'1.2-2' }} SEK</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-3 mt-8">
+          <button 
+            type="button" 
+            (click)="onSubmit()"
+            [disabled]="submitting || submittingAndSigning"
+            class="px-6 py-2 rounded-lg bg-gray-600 text-white font-semibold hover:bg-gray-700 transition flex items-center gap-2"
+          >
+            <svg *ngIf="submitting" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ submitting ? 'Creating Receipt...' : 'Create Receipt' }}
+          </button>
+          <button 
+            type="button" 
+            (click)="onSubmitAndSign()"
+            [disabled]="submitting || submittingAndSigning"
+            class="px-6 py-2 rounded-lg bg-primary text-white font-semibold hover:bg-primary-dark transition flex items-center gap-2"
+          >
+            <svg *ngIf="submittingAndSigning" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <i class="ri-file-text-line" *ngIf="!submittingAndSigning"></i>
+            {{ submittingAndSigning ? 'Creating & Signing...' : 'Create and Sign Receipt' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Right: Preview -->
+    <div class="bg-white rounded-2xl shadow p-8 overflow-x-auto">
+      <div class="font-semibold text-lg mb-2">Preview <span class="text-xs text-gray-400 font-normal">(Updated in real time)</span></div>
+      <div class="border rounded-xl p-6 bg-gray-50 min-w-[320px] max-w-full">
+        <div class="text-center text-xl font-extrabold mb-6 tracking-wide break-words">RECEIPT</div>
+        
+        <!-- Receipt Information and Organization -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div class="bg-white rounded-lg p-4 border">
+            <div class="font-semibold mb-2">Receipt Information</div>
+            <div class="space-y-1">
+              <div class="text-sm"><span class="text-gray-600">Receipt number:</span> <span class="font-medium text-gray-900">{{ invoiceDetails.invoiceNumber || '...' }}</span></div>
+              <div class="text-sm"><span class="text-gray-600">Date:</span> <span class="font-medium text-gray-900">{{ invoiceForm.get('receiptDate')?.value || '...' }}</span></div>
+              <div class="text-sm"><span class="text-gray-600">Due date:</span> <span class="font-medium text-gray-900">{{ invoiceForm.get('dueDate')?.value || '...' }}</span></div>
+              <div class="text-sm"><span class="text-gray-600">Customer number:</span> <span class="font-medium text-gray-900">{{ invoiceForm.get('customerNumber')?.value || '...' }}</span></div>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-lg p-4 border">
+            <div class="font-semibold mb-2">Organization</div>
+            <div class="space-y-1">
+              <div class="text-sm"><span class="text-gray-600">Name:</span> <span class="font-medium text-gray-900">{{ companyDetails.name || '...' }}</span></div>
+              <div class="text-sm"><span class="text-gray-600">Organization:</span> <span class="font-medium text-gray-900">{{ companyDetails.orgNumber || '...' }}</span></div>
+              <div class="text-sm"><span class="text-gray-600">Organization number:</span> <span class="font-medium text-gray-900">{{ invoiceForm.get('organizationNumber')?.value || '...' }}</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Information -->
+        <div class="bg-white rounded-lg p-4 border mb-4">
+          <div class="font-semibold mb-2">Customer Information</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="text-sm"><span class="text-gray-600">Type:</span> <span class="font-medium text-gray-900">{{ invoiceForm.get('customerType')?.value || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Contact person:</span> <span class="font-medium text-gray-900">{{ invoiceForm.get('contactPerson')?.value || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Email:</span> <span class="font-medium text-gray-900">{{ invoiceForm.get('email')?.value || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Telephone:</span> <span class="font-medium text-gray-900">{{ invoiceForm.get('telephoneNumber')?.value || '...' }}</span></div>
+          </div>
+        </div>
+
+        <!-- Item Details -->
+        <div class="bg-white rounded-lg p-4 border mb-4">
+          <div class="font-semibold mb-2">Item Details</div>
+          <div class="space-y-2" *ngIf="invoiceItems.controls.length > 0">
+            <div *ngFor="let item of invoiceItems.controls; let i = index" class="border-b pb-2 last:border-b-0">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div class="text-sm"><span class="text-gray-600">Product:</span> <span class="font-medium text-gray-900">{{ item.get('product')?.value || '...' }}</span></div>
+                <div class="text-sm"><span class="text-gray-600">Quantity:</span> <span class="font-medium text-gray-900">{{ item.get('number')?.value || '...' }}</span></div>
+                <div class="text-sm"><span class="text-gray-600">Unit:</span> <span class="font-medium text-gray-900">{{ item.get('unit')?.value || '...' }}</span></div>
+                <div class="text-sm"><span class="text-gray-600">Price excl. VAT:</span> <span class="font-medium text-gray-900">{{ item.get('priceExclVAT')?.value || '...' }} SEK</span></div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="invoiceItems.controls.length === 0" class="text-sm text-gray-500">No items added yet</div>
+        </div>
+
+        <!-- Payment Summary -->
+        <div class="bg-white rounded-lg p-4 border">
+          <div class="font-semibold mb-2">Payment Summary</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="text-sm"><span class="text-gray-600">Subtotal:</span> <span class="font-medium text-gray-900">{{ calculateTotals().net | number:'1.2-2' }} SEK</span></div>
+            <div class="text-sm"><span class="text-gray-600">VAT:</span> <span class="font-medium text-gray-900">{{ calculateTotals().vat | number:'1.2-2' }} SEK</span></div>
+            <div class="text-sm"><span class="text-gray-600">Language:</span> <span class="font-medium text-gray-900">{{ invoiceDetails.language || 'English' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Currency:</span> <span class="font-medium text-gray-900">{{ invoiceDetails.currency || 'SEK' }}</span></div>
+            <div class="text-sm font-semibold border-t pt-2 col-span-full"><span class="text-gray-900">Total amount:</span> <span class="font-bold text-gray-900">{{ calculateTotals().total | number:'1.2-2' }} SEK</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,142 @@
+<div class="mb-6 md:mb-8">
+  <div class="flex flex-col space-y-2">
+    <h1 class="text-2xl md:text-3xl font-bold text-primary">
+      {{title}}
+    </h1>
+    <p *ngIf="subtitle" class="text-sm md:text-base text-primary/60">
+      {{subtitle}}
+    </p>
+  </div>
+</div>
+
+<div class="flex flex-col lg:flex-row justify-between items-start  shadow-sm rounded-lg p-4 lg:items-center gap-3 lg:gap-4 mb-4 lg:mb-6">
+  <div class="flex items-center space-x-3 lg:space-x-5 w-full lg:w-auto">
+    <div class="w-full lg:w-auto">
+      <div class="space-y-1">
+        <div class="flex items-center space-x-3">
+          <h1 class="text-xl sm:text-2xl font-semibold text-primary truncate">
+            {{title}}
+          </h1>
+        </div>
+        <div class="flex items-center">
+          <p class="text-sm text-gray-600 truncate">
+            {{subtitle || ''}}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center space-x-4 sm:space-x-6 w-full sm:w-auto justify-end">
+    <!-- Search Bar -->
+    <!-- <div class="relative flex-1 sm:flex-none">
+      <input type="text" 
+             placeholder="Search..." 
+             class="w-full sm:w-64 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200 
+                    focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500
+                    transition-all duration-200 text-sm">
+      <i class="ri-search-line absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+    </div> -->
+
+    <!-- Notifications Dropdown -->
+    <!-- <div class="relative">
+      <button (click)="toggleNotifications($event)" 
+              class="relative p-2 hover:bg-gray-50 rounded-lg transition-all duration-200">
+        <i class="fas fa-bell text-lg text-gray-600"></i>
+        <span *ngIf="unreadCount > 0" 
+              class="absolute -top-1 -right-1 w-5 h-5 bg-indigo-500 text-white text-xs
+                     flex items-center justify-center rounded-full">
+          {{unreadCount}}
+        </span>
+      </button>
+      
+      
+      <div *ngIf="isNotificationsOpen"
+           class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 bg-white rounded-lg shadow-lg border border-gray-100 
+                  z-50 transform origin-top transition-all duration-200">
+        
+        <div class="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-gray-100 flex items-center justify-between">
+          <h3 class="font-semibold text-gray-800 text-sm sm:text-base">Notifications</h3>
+          <button *ngIf="unreadCount > 0" 
+                  (click)="markAllAsRead()"
+                  class="text-[10px] sm:text-xs text-indigo-800  hover:text-[#d66937] font-medium">
+            Mark all as read
+          </button>
+        </div>
+
+       
+        <div class="max-h-[280px] sm:max-h-[320px] overflow-y-auto">
+          <div *ngFor="let notification of notifications"
+               class="px-3 sm:px-4 py-2.5 sm:py-3 hover:bg-gray-50 flex items-start space-x-2 sm:space-x-3 cursor-pointer"
+               [class.border-l-4]="!notification.read"
+               [routerLink]="notification.link"
+               (click)="markAsRead(notification._id)"
+               [class.border-indigo-800 ]="!notification.read">
+            <div class="w-7 sm:w-8 h-7 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                 [class.bg-indigo-800 ]="!notification.read"
+                 [class.bg-gray-100]="notification.read">
+              <i [class]="getNotificationIcon(notification.type)"
+                 [class.text-indigo-800 ]="!notification.read"
+                 [class.text-gray-600]="notification.read"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs sm:text-sm" 
+                 [class.text-gray-800]="!notification.read" 
+                 [class.font-medium]="!notification.read" 
+                 [class.text-gray-600]="notification.read">
+                {{notification.title}}
+              </p>
+              <p class="text-[10px] sm:text-xs text-gray-500 mt-0.5">{{notification.message}}</p>
+              <span class="text-[10px] sm:text-xs text-gray-400 mt-1">{{getTimeAgo(notification.createdAt)}}</span>
+            </div>
+          </div>
+
+          <div *ngIf="notifications.length === 0" class="px-4 py-6 text-center text-gray-500 text-xs sm:text-sm">
+            No notifications yet
+          </div>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- User Profile -->
+    <div class="relative">
+      <button (click)="toggleProfileDropdown($event)" 
+              class="flex items-center space-x-3 p-2 rounded-lg transition-all duration-200">
+        <div class="w-10 h-10 rounded-lg bg-primary-light flex items-center justify-center">
+          <span class="text-primary font-medium text-base">{{user?.first_name?.charAt(0) || ''}}{{user?.last_name?.charAt(0) || ''}}</span>
+        </div>
+        <div class="text-left hidden sm:block">
+          <p class="text-sm font-medium text-primary truncate max-w-[120px]">{{user?.first_name}} {{user?.last_name}}</p>
+          <!-- <p class="text-xs text-gray-500 truncate max-w-[120px]">{{user?.email}}</p> -->
+        </div>
+        <i class="ri-arrow-down-s-line text-primary/60"
+           [class.rotate-180]="isProfileDropdownOpen"
+           class="transition-transform duration-200"></i>
+      </button>
+
+      <!-- Profile Dropdown Menu -->
+      <div *ngIf="isProfileDropdownOpen"
+           class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-64  rounded-lg shadow-lg border border-primary/10 
+                  z-50 transform origin-top transition-all duration-200">
+        <div class="p-4 border-b border-primary/10">
+          <p class="font-medium text-primary text-sm truncate">{{user?.firstName}} {{user?.lastName}}</p>
+          <p class="text-xs text-gray-500 truncate">{{user?.email}}</p>
+        </div>
+        
+        <div class="py-2">
+          <a routerLink="/dashboard/profile" 
+             class="flex items-center space-x-3 px-4 py-2.5 transition-colors">
+            <i class="ri-user-settings-line text-primary"></i>
+            <span class="text-sm text-gray-700">Account Settings</span>
+          </a>
+          <button type="button" 
+                  (click)="logout()" 
+                  class="flex w-full items-center space-x-3 px-4 py-2.5 transition-colors">
+            <i class="ri-logout-box-line text-primary"></i>
+            <span class="text-sm text-gray-700">Logout</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

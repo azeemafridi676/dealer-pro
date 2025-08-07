@@ -1,0 +1,6 @@
+<div [@deleteAnimation]="deleteState"
+     (@deleteAnimation.done)="onDeleteAnimationDone($event, tag)"
+     [style.background-color]="tag?.backgroundColor"
+     [style.color]="tag?.color"
+     class="app-tag"
+     (click)="onTagClicked()">{{tag?.name}}</div>

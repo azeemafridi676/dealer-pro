@@ -1,0 +1,279 @@
+<div class="container mx-auto py-6 px-4">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Payment Information Form -->
+    <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()" class="bg-white rounded-xl p-8 border border-gray-200 shadow-sm">
+      <!-- Info Alert -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-start">
+        <i class="ri-information-line text-blue-600 mr-3 mt-1 text-xl"></i>
+        <p class="text-blue-800 text-sm">
+          Customer information such as address and city are automatically retrieved and displayed in the preview.
+        </p>
+      </div>
+
+      <div class="space-y-6">
+        <!-- Reference and Category -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Reference -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-2">Reference</label>
+            <div class="relative flex items-center">
+              <i class="ri-file-text-line absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              <input 
+                type="text" 
+                formControlName="reference" 
+                placeholder="Enter customer number" 
+                class="w-full pl-10 px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              >
+            </div>
+            <div *ngIf="isFieldInvalid('reference')" class="text-red-500 text-xs mt-1">
+              {{ getFieldError('reference') }}
+            </div>
+          </div>
+
+          <!-- Name -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-2">Name</label>
+            <input 
+              type="text" 
+              formControlName="name" 
+              placeholder="Enter customer name" 
+              class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            >
+            <div *ngIf="isFieldInvalid('name')" class="text-red-500 text-xs mt-1">
+              {{ getFieldError('name') }}
+            </div>
+          </div>
+
+          <!-- Category -->
+          <div class="md:col-span-2">
+            <label class="block text-gray-700 font-medium mb-2">Payment Category</label>
+            <app-custom-select 
+              formControlName="category"
+              [options]="categories"
+              placeholder="Select payment category"
+            ></app-custom-select>
+            <div *ngIf="isFieldInvalid('category')" class="text-red-500 text-xs mt-1">
+              {{ getFieldError('category') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Description</label>
+          <textarea 
+            formControlName="description"
+            placeholder="Enter description" 
+            class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            rows="4"
+          ></textarea>
+          <div *ngIf="isFieldInvalid('description')" class="text-red-500 text-xs mt-1">
+            {{ getFieldError('description') }}
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Email</label>
+          <input 
+            type="email" 
+            formControlName="email" 
+            placeholder="Enter email" 
+            class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+          >
+          <div *ngIf="isFieldInvalid('email')" class="text-red-500 text-xs mt-1">
+            {{ getFieldError('email') }}
+          </div>
+        </div>
+
+        <!-- Personal Information Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <!-- Social Security Number -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-2">Social security number</label>
+            <input 
+              type="text" 
+              formControlName="socialSecurityNumber" 
+              placeholder="Enter social security number" 
+              class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            >
+            <div *ngIf="isFieldInvalid('socialSecurityNumber')" class="text-red-500 text-xs mt-1">
+              {{ getFieldError('socialSecurityNumber') }}
+            </div>
+          </div>
+
+          <!-- Telephone Number -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-2">Telephone number</label>
+            <input 
+              type="tel" 
+              formControlName="telephoneNumber" 
+              placeholder="Enter telephone number" 
+              class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            >
+            <div *ngIf="isFieldInvalid('telephoneNumber')" class="text-red-500 text-xs mt-1">
+              {{ getFieldError('telephoneNumber') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Amounts Section -->
+        <div formArrayName="amounts" class="mt-6">
+          <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center">
+              <label class="block text-gray-700 font-medium mr-2">Amount</label>
+              <i class="ri-information-line text-gray-500" title="Enter payment amounts"></i>
+            </div>
+            <div class="text-sm text-gray-500">Total: {{ calculateTotalAmount() }} kr</div>
+          </div>
+
+          <div *ngFor="let amountGroup of amountsArray.controls; let i = index" 
+               [formGroupName]="i" 
+               class="flex items-center gap-4 mb-4 bg-gray-50 p-3 rounded-lg border border-gray-200">
+            <div class="relative flex-1">
+              <label class="block text-xs text-gray-500 mb-1">Amount (kr)</label>
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">kr</span>
+                <input 
+                  type="number" 
+                  formControlName="amount" 
+                  placeholder="Enter amount" 
+                  class="w-full pl-8 px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                >
+                <div *ngIf="isAmountFieldInvalid(i, 'amount')" class="text-red-500 text-xs mt-1">
+                  {{ getAmountFieldError(i, 'amount') }}
+                </div>
+              </div>
+            </div>
+            <div class="flex-1">
+              <label class="block text-xs text-gray-500 mb-1">Description (optional)</label>
+              <input 
+                type="text" 
+                formControlName="description" 
+                placeholder="Enter description" 
+                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              >
+            </div>
+            <div class="self-end">
+              <button 
+                *ngIf="amountsArray.length > 1" 
+                type="button" 
+                (click)="removeAmount(i)" 
+                class="text-gray-400 hover:text-red-500 p-2 rounded-full hover:bg-red-50 transition"
+                title="Remove amount"
+              >
+                <i class="ri-delete-bin-line"></i>
+              </button>
+            </div>
+          </div>
+
+          <button 
+            type="button" 
+            (click)="addAmount()" 
+            class="text-primary hover:bg-primary/10 px-3 py-2 rounded-md transition flex items-center"
+          >
+            <i class="ri-add-line mr-1"></i>Add another amount
+          </button>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="mt-8 flex justify-between">
+        <button 
+          type="button"
+          routerLink="/swish"
+          class="px-6 py-3 text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+        >
+          Cancel
+        </button>
+        <button 
+          type="submit" 
+          [disabled]="isSubmitting"
+          class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark transition flex items-center gap-2"
+        >
+          <svg *ngIf="isSubmitting" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Register payment
+        </button>
+      </div>
+    </form>
+
+    <!-- Preview Section -->
+    <div class="bg-white rounded-xl p-8 border border-gray-200 shadow-sm">
+      <h2 class="text-xl font-bold text-gray-900 mb-6">Payment Receipt</h2>
+      
+      <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm text-gray-500 mb-1">Reference:</label>
+            <div class="text-gray-900 font-medium">{{ paymentForm.get('reference')?.value }}</div>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-500 mb-1">Date:</label>
+            <div class="text-gray-900 font-medium">{{ getCurrentDate() }}</div>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-4 mb-4">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Customer Information</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-gray-500 mb-1">Customer Name:</label>
+              <div class="text-gray-900 font-medium">{{ paymentForm.get('name')?.value }}</div>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-500 mb-1">Customer Number:</label>
+              <div class="text-gray-900 font-medium">{{ paymentForm.get('reference')?.value }}</div>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-500 mb-1">Social security number:</label>
+              <div class="text-gray-900 font-medium">{{ paymentForm.get('socialSecurityNumber')?.value }}</div>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-500 mb-1">Telephone:</label>
+              <div class="text-gray-900 font-medium">{{ paymentForm.get('telephoneNumber')?.value }}</div>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-500 mb-1">Email:</label>
+              <div class="text-gray-900 font-medium">{{ paymentForm.get('email')?.value }}</div>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-500 mb-1">Category:</label>
+              <div class="text-gray-900 font-medium">{{ getCustomerInfo().category }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-4 mb-4">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Payment Information</h3>
+          <div class="space-y-2">
+            <div *ngFor="let amountGroup of amountsArray.controls; let i = index" class="flex justify-between">
+              <div>
+                <span class="text-gray-700">{{ amountGroup.get('amount')?.value }} kr</span>
+              </div>
+              <span class="text-gray-500">{{ amountGroup.get('description')?.value }}</span>
+            </div>
+            <div class="flex justify-between font-bold border-t border-gray-200 pt-2 mt-2">
+              <span>Total</span>
+              <span>{{ calculateTotalAmount() }} kr</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-4">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Description</h3>
+          <div class="text-gray-900">{{ paymentForm.get('description')?.value }}</div>
+        </div>
+      </div>
+
+      <!-- Business Information -->
+      <div class="mt-4 text-sm text-gray-500 text-center">
+        <p>Org.nr: 556789-1234</p>
+        <p>Helsingborgsvägen 123, 252 31 Helsingborg</p>
+        <p>Tel: 042-12 34 56 | info&#64;lindstrommobil.se</p>
+      </div>
+    </div>
+  </div>
+</div>

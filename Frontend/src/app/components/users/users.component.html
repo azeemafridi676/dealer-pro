@@ -1,0 +1,308 @@
+<div class="container mx-auto py-6">
+  <div class="flex flex-col lg:flex-row justify-between items-start  p-4 lg:items-center gap-3 lg:gap-4 mb-4 lg:mb-6">
+    <div class="flex w-full items-center justify-between space-x-3 lg:space-x-5 w-full ">
+      <div >
+        <div class="space-y-1">
+          <div class="flex items-center space-x-3">
+            <h1 class="text-2xl sm:text-2xl font-semibold text-primary truncate">
+                Users Management
+            </h1>
+          </div>
+          <div class="flex items-center">
+            <p class="text-sm text-gray-600 truncate">
+              Manage users and their roles.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end items-center mb-6">
+        <button (click)="openModal()" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors flex items-center">
+          <i class="ri-user-add-line mr-2"></i>Add User
+        </button>
+      </div>
+    </div>
+  </div>
+  
+
+  <!-- Users Table -->
+  <div class=" rounded-lg shadow overflow-hidden bg-white" *ngIf="!loading">
+    <table class="min-w-full divide-y divide-primary/10">
+      <thead class="">
+        <tr>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider">Name</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider">Email</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider">Role</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider">Type</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider">Joined</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider">Status</th>
+          <th scope="col" class="px-6 py-3 text-right text-xs font-medium  uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class=" divide-y divide-primary/10">
+        <tr *ngFor="let user of users" class="cursor-pointer" (click)="selectUser(user.user_id)">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-10 w-10 bg-primary rounded-full flex items-center justify-center">
+                <span class="text-white font-medium">{{ user.first_name.charAt(0) }}{{ user.last_name.charAt(0) }}</span>
+              </div>
+              <div class="ml-4">
+                <div class="text-sm font-medium text-main">{{ user.first_name }} {{ user.last_name }}</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-main">{{ user.email }}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-main">{{ user.role?.name || 'No Role' }}</div>
+            <div class="text-xs text-main-light">{{ user.permissionsCount }} permissions</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full  text-main">
+              {{ user.user_type }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-main-light">
+            {{ formatDate(user.created_at) }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span [ngClass]="user.is_active ? 'bg-green/30 text-green-800' : 'bg-red text-red'" class="px-2 inline-flex text-xs leading-5 font-medium rounded-full">
+              {{ user.is_active ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <div class="flex justify-end items-center space-x-2">
+              <button (click)="$event.stopPropagation(); openModal(user)" class="text-primary hover:text-primary-dark mr-2">
+                <i class="ri-edit-line text-2xl"></i>
+              </button>
+              <button (click)="deleteUser(user.user_id); $event.stopPropagation();" class="text-red-600 hover:text-red-800">
+                <i class="ri-delete-bin-line text-2xl"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="users.length === 0 && !loading">
+          <td colspan="7" class="px-6 py-4 text-center text-primary/60">
+            No users found
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- Pagination Controls -->
+  <div *ngIf="!loading && !loadingError && totalItems > 0" class="mt-6 flex justify-between items-center">
+    <div class="text-sm text-gray-500">
+      Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ currentPage * itemsPerPage > totalItems ? totalItems : currentPage * itemsPerPage }} of {{ totalItems }} users
+    </div>
+    <nav aria-label="Pagination" class="flex space-x-1">
+      <button 
+        [disabled]="currentPage === 1"
+        (click)="changePage(currentPage - 1)" 
+        class="p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Previous page"
+      >
+        <i class="ri-arrow-left-s-line"></i>
+      </button>
+      <ng-container *ngFor="let page of getDisplayedPageNumbers()">
+        <button 
+          (click)="changePage(page)"
+          [ngClass]="{
+            'bg-primary text-white hover:bg-primary/90': page === currentPage,
+            'bg-white text-gray-500 hover:bg-gray-50': page !== currentPage
+          }"
+          class="h-9 w-9 flex items-center justify-center rounded-full border border-gray-200"
+        >
+          {{ page }}
+        </button>
+      </ng-container>
+      <button 
+        [disabled]="currentPage === totalPages || totalPages === 0"
+        (click)="changePage(currentPage + 1)" 
+        class="p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Next page"
+      >
+        <i class="ri-arrow-right-s-line"></i>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="container mx-auto py-6">
+    <!-- Skeleton Table -->
+    <div class="rounded-lg shadow overflow-hidden bg-white">
+      <table class="min-w-full divide-y divide-primary/10">
+        <thead class="">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              <div class="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              <div class="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              <div class="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              <div class="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              <div class="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              <div class="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">
+              <div class="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-primary/10">
+          <tr *ngFor="let i of [1,2,3,4,5]" class="animate-pulse">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                <div class="ml-4">
+                  <div class="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded mb-1"></div>
+              <div class="h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right">
+              <div class="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded ml-auto"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- User Modal -->
+<div *ngIf="isVisible" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50" @modalAnimation>
+  <div class="bg-white dark:bg-gray-800 rounded-lg w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700" (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-2">
+      <div class="flex items-center space-x-2">
+        <i class="ri-user-add-line text-xl text-main"></i>
+        <h2 class="text-xl font-bold text-main">{{ isEditMode ? 'Edit User' : 'Add New User' }}</h2>
+      </div>
+      <button (click)="closeModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+        <i class="ri-close-line text-xl"></i>
+      </button>
+    </div>
+    <div class="text-sm text-gray-500 mb-4">{{ isEditMode ? 'Update user details and permissions.' : 'Add a new user to your organization.' }}</div>
+
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <div>
+        <h4 class="text-lg font-semibold text-main mb-2">User Information</h4>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-main text-sm font-medium mb-2" for="first_name">First Name *</label>
+            <div class="relative">
+              <i class="ri-user-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input type="text" id="first_name" formControlName="first_name" placeholder="Enter first name"
+                class="w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+                [ngClass]="{'border-red': userForm.get('first_name')?.invalid && userForm.get('first_name')?.touched}">
+            </div>
+            <div *ngIf="userForm.get('first_name')?.invalid && userForm.get('first_name')?.touched" class="text-red text-xs mt-1">{{ getFieldError('first_name') }}</div>
+          </div>
+          <div>
+            <label class="block text-main text-sm font-medium mb-2" for="last_name">Last Name *</label>
+            <div class="relative">
+              <i class="ri-user-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input type="text" id="last_name" formControlName="last_name" placeholder="Enter last name"
+                class="w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+                [ngClass]="{'border-red': userForm.get('last_name')?.invalid && userForm.get('last_name')?.touched}">
+            </div>
+            <div *ngIf="userForm.get('last_name')?.invalid && userForm.get('last_name')?.touched" class="text-red text-xs mt-1">{{ getFieldError('last_name') }}</div>
+          </div>
+          <div>
+            <label class="block text-main text-sm font-medium mb-2" for="email">Email *</label>
+            <div class="relative">
+              <i class="ri-mail-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input type="email" id="email" formControlName="email" placeholder="Enter email"
+                class="w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+                [ngClass]="{'border-red': userForm.get('email')?.invalid && userForm.get('email')?.touched}">
+            </div>
+            <div *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched" class="text-red text-xs mt-1">{{ getFieldError('email') }}</div>
+          </div>
+          <div>
+            <label class="block text-main text-sm font-medium mb-2" for="password">Password {{ isEditMode ? '' : '*' }}</label>
+            <div class="relative">
+              <i class="ri-lock-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input type="password" id="password" formControlName="password" placeholder="Enter password"
+                class="w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white"
+                [ngClass]="{'border-red': userForm.get('password')?.invalid && userForm.get('password')?.touched}">
+            </div>
+            <div *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched" class="text-red text-xs mt-1">{{ getFieldError('password') }}</div>
+            <div *ngIf="isEditMode" class="text-gray-500 text-xs mt-1">Leave blank to keep current password</div>
+          </div>
+          <div>
+            <label class="block text-main text-sm font-medium mb-2" for="user_type">User Type</label>
+            <app-custom-select 
+              formControlName="user_type"
+              [options]="userTypeOptions"
+              placeholder="Select user type"
+              [ngClass]="{'border-red': userForm.get('user_type')?.invalid && userForm.get('user_type')?.touched}"
+            ></app-custom-select>
+            <div *ngIf="userForm.get('user_type')?.invalid && userForm.get('user_type')?.touched" class="text-red text-xs mt-1">{{ getFieldError('user_type') }}</div>
+          </div>
+          <div>
+            <label class="block text-gray-700 font-medium mb-2">User Role</label>
+            <app-custom-select 
+              formControlName="role_id"
+              [options]="roleOptions"
+              placeholder="Select user role"
+              [ngClass]="{'border-red': userForm.get('role_id')?.invalid && userForm.get('role_id')?.touched}"
+            ></app-custom-select>
+            <div *ngIf="userForm.get('role_id')?.invalid && userForm.get('role_id')?.touched" class="text-red text-xs mt-1">{{ getFieldError('role_id') }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end mt-6 space-x-3">
+        <button type="button" (click)="closeModal()"
+          class="px-4 py-2 bg-white border border-primary rounded-md text-primary hover:bg-primary/5 transition-colors">
+          Cancel
+        </button>
+        <button type="submit" [disabled]="userForm.invalid || loading"
+          class="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary-dark transition-colors flex items-center border border-primary/20">
+          <svg *ngIf="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ loading ? 'Saving...' : (isEditMode ? 'Update' : 'Create') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div *ngIf="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-white rounded-xl w-full max-w-md p-8 border border-gray-200 relative shadow-xl flex flex-col items-center">
+    <button (click)="closeDeleteModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl">
+      <i class="ri-close-line"></i>
+    </button>
+    <i class="ri-delete-bin-line text-primary text-4xl mb-4"></i>
+    <h2 class="text-xl font-bold text-gray-900 mb-2">Delete User</h2>
+    <p class="text-gray-600 mb-6 text-center">Are you sure you want to delete this user? This action cannot be undone.</p>
+    <div class="flex gap-4 w-full justify-center">
+      <button type="button" (click)="closeDeleteModal()" class="px-5 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">Cancel</button>
+      <button type="button" (click)="confirmDeleteUser()" class="px-5 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition">Delete</button>
+    </div>
+  </div>
+</div> 

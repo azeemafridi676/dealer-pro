@@ -1,0 +1,195 @@
+<!-- Corporation Users List View -->
+<div *ngIf="viewMode === 'list'">
+  <div class="container mx-auto py-6">
+    <!-- Header with Back Button and Title -->
+    <div class="flex flex-col lg:flex-row justify-between items-start  p-4 lg:items-center gap-3 lg:gap-4 mb-4 lg:mb-6">
+      <div class="flex w-full items-center justify-between space-x-3 lg:space-x-5 w-full ">
+        <div >
+          <button (click)="goBack()" class="mr-2 text-white bg-primary rounded-full w-7 h-7 flex items-center justify-center">
+            <i class="ri-arrow-left-line text-md"></i>
+          </button>
+          <div class="space-y-1">
+            <div class="flex items-center space-x-3">
+              <h1 class="text-2xl sm:text-2xl font-semibold text-primary truncate">
+               
+                Users for {{ selectedCorp?.corp_name }}              </h1>
+            </div>
+            <div class="flex items-center">
+              <p class="text-sm text-gray-600 truncate">
+                Manage users for {{ selectedCorp?.corp_name }}.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-end items-center mb-6">
+          <button (click)="openModal()" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors flex items-center">
+            <i class="ri-user-add-line mr-2"></i>Add User
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class=" rounded-lg shadow overflow-hidden bg-white  border border-[#e5e7eb]">
+      <table class="min-w-full divide-y divide-primary/10">
+        <thead class="">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider">Name</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider">Email</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider">Mobile</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider">User Type</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider">Role</th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-medium  uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class=" divide-y divide-primary/10">
+          <tr *ngFor="let user of filteredUsers" class="hover:">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center cursor-pointer" >
+                <div class="flex-shrink-0 h-10 w-10 bg-primary rounded-full flex items-center justify-center">
+                  <span class="text-white font-medium">{{ user.first.charAt(0) }}</span>
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-main">{{ user.first }} {{ user.last }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-main">{{ user.email }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-main">{{ user.mobile || 'N/A' }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full  text-main">
+                {{ user.type }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full  text-main">
+                {{ user.UserRole?.name || 'N/A' }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <button (click)="openModal(user)" class="text-main hover:text-main-dark mr-3">
+                <i class="ri-edit-line text-primary"></i>
+              </button>
+              <button (click)="deleteUser(user.id)" class="text-red hover:text-red">
+                <i class="ri-delete-bin-line text-primary"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredUsers.length === 0">
+            <td colspan="6" class="px-6 py-4 text-center text-main-light">
+              No users found
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div *ngIf="loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class=" p-5 rounded-lg flex flex-col items-center">
+        <svg class="animate-spin h-10 w-10 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="mt-2 text-primary/60">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- User Modal -->
+<div *ngIf="isVisible" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md p-6 max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700" [@modalAnimation] (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold text-primary">
+        {{ isEditMode ? 'Edit User' : 'Add New User' }}
+      </h2>
+      <button (click)="closeModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+        <i class="ri-close-line text-xl"></i>
+      </button>
+    </div>
+
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">First Name *</label>
+          <input 
+            type="text" 
+            formControlName="first" 
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Last Name *</label>
+          <input 
+            type="text" 
+            formControlName="last" 
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Email *</label>
+          <input 
+            type="email" 
+            formControlName="email" 
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Password {{ !isEditMode ? '*' : '' }}</label>
+          <input 
+            type="password" 
+            formControlName="password" 
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white">
+          <p *ngIf="isEditMode" class="mt-1 text-sm text-gray-500">Leave blank to keep current password</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Mobile</label>
+          <input 
+            type="text" 
+            formControlName="mobile" 
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">User Type</label>
+          <select 
+            formControlName="type" 
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white">
+            <option value="User">User</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-main mb-1">Role</label>
+          <select 
+            formControlName="role" 
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-main dark:bg-gray-700 dark:text-white">
+            <option value="">No Role</option>
+            <option *ngFor="let role of roles" [value]="role.name">{{ role.name }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-3 mt-6">
+        <button 
+          type="button" 
+          (click)="closeModal()" 
+          class="px-4 py-2 bg-white border border-primary rounded-md text-primary hover:bg-primary/5 transition-colors">
+          Cancel
+        </button>
+        <button 
+          type="submit"
+          [disabled]="!userForm.valid || loading"
+          class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors flex items-center border border-primary/20">
+          {{ isEditMode ? 'Update' : 'Create' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div> 

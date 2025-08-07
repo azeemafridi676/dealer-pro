@@ -1,0 +1,1995 @@
+<div class="container mx-auto py-6">
+  <!-- Stats Cards Section -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <!-- Total Vehicles Card -->
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-medium text-gray-500">Total Vehicles</h3>
+        <div
+          class="p-3 bg-primary/10 w-[3.5rem] h-[3.5rem] flex justify-center items-center rounded-full"
+        >
+          <i class="ri-car-line text-xl text-primary"></i>
+        </div>
+      </div>
+      <div
+        *ngIf="loading; else totalVehiclesContent"
+        class="flex items-end gap-2"
+      >
+        <div class="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+        <div class="h-4 w-12 bg-gray-100 rounded animate-pulse mb-1"></div>
+      </div>
+      <ng-template #totalVehiclesContent>
+        <div class="flex items-end gap-2">
+          <span class="text-3xl font-bold">{{ totalItems || 0 }}</span>
+          <span class="text-sm text-gray-500 mb-1">vehicles</span>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Vehicles Sold Card -->
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-medium text-gray-500">Vehicles Sold</h3>
+        <div
+          class="p-3 bg-green/10 w-[3.5rem] h-[3.5rem] flex justify-center items-center rounded-full"
+        >
+          <i class="ri-check-line text-xl text-green-600"></i>
+        </div>
+      </div>
+      <div
+        *ngIf="loading; else vehiclesSoldContent"
+        class="flex items-end gap-2"
+      >
+        <div class="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+        <div class="h-4 w-12 bg-gray-100 rounded animate-pulse mb-1"></div>
+      </div>
+      <ng-template #vehiclesSoldContent>
+        <div class="flex items-end gap-2">
+          <span class="text-3xl font-bold">{{ stats.soldVehicles || 0 }}</span>
+          <span class="text-sm text-gray-500 mb-1">vehicles</span>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Average Inventory Days Card -->
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-medium text-gray-500">
+          Average Inventory Days
+        </h3>
+        <div
+          class="p-3 bg-primary/10 w-[3.5rem] h-[3.5rem] flex justify-center items-center rounded-full"
+        >
+          <i class="ri-time-line text-xl text-blue-600"></i>
+        </div>
+      </div>
+      <div
+        *ngIf="loading; else avgInventoryDaysContent"
+        class="flex items-end gap-2"
+      >
+        <div class="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+        <div class="h-4 w-12 bg-gray-100 rounded animate-pulse mb-1"></div>
+      </div>
+      <ng-template #avgInventoryDaysContent>
+        <div class="flex items-end gap-2">
+          <span class="text-3xl font-bold">{{
+            stats.averageInventoryDays || 0
+          }}</span>
+          <span class="text-sm text-gray-500 mb-1">days</span>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Top Actions Section -->
+  <form [formGroup]="filterForm">
+    <div class="flex flex-wrap gap-[40%] mb-6">
+      <div class="flex-1 w-30">
+        <input
+          type="text"
+          placeholder="Search by Reg No, Brand, Model..."
+          class="form-input w-full rounded-xl border border-gray-200 px-4 py-3 h-12"
+          formControlName="searchTerm"
+        />
+      </div>
+      <div class="flex gap-2 relative">
+        <!-- Filter Button (opens right-side panel) -->
+        <button
+          type="button"
+          class="bg-white border border-gray-200 text-gray-700 px-4 py-2 h-12 rounded-xl flex items-center hover:bg-gray-50 transition shadow-sm"
+          (click)="openFilterPanel()"
+        >
+          <i class="ri-filter-3-line mr-2"></i>Filter
+        </button>
+        <!-- Add Vehicle Button -->
+        <button
+          type="button"
+          (click)="isVisible = true"
+          class="bg-primary hover:bg-primary-dark text-white px-4 py-2 h-12 rounded-xl transition-colors flex items-center shadow-sm"
+        >
+          <i class="ri-add-line mr-2"></i>Add Vehicle
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Right-side Filter Panel with Overlay -->
+  <div *ngIf="showFilterPanel">
+    <!-- Overlay -->
+    <div
+      class="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity"
+      (click)="closeFilterPanel()"
+    ></div>
+    <!-- Side Panel -->
+    <div
+      class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-50 shadow-xl transition-transform duration-300"
+      @modalAnimation
+    >
+      <div class="flex flex-col h-full">
+        <div
+          class="flex items-center justify-between p-6 border-b flex-shrink-0"
+        >
+          <h2 class="text-xl font-bold">Filter Vehicles</h2>
+          <button
+            (click)="closeFilterPanel()"
+            class="text-gray-400 hover:text-gray-600 text-2xl"
+          >
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <form
+          [formGroup]="filterForm"
+          class="flex-1 flex flex-col overflow-hidden"
+        >
+          <div class="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+            <!-- Vehicle Type -->
+            <div>
+              <label class="block text-gray-700 font-medium mb-1"
+                >Vehicle Type</label
+              >
+              <input
+                type="text"
+                placeholder="e.g., SUV, Sedan"
+                class="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+                formControlName="vehicleTypeAdv"
+              />
+            </div>
+            <!-- Status -->
+            <div>
+              <label class="block text-gray-700 font-medium mb-1">Status</label>
+              <app-custom-select
+                formControlName="statusAdv"
+                [options]="statusOptions"
+                placeholder="Select Status"
+              ></app-custom-select>
+            </div>
+            <!-- Price Range -->
+            <div class="flex gap-2">
+              <div class="flex-1">
+                <label class="block text-gray-700 font-medium mb-1"
+                  >Price From</label
+                >
+                <input
+                  type="number"
+                  placeholder="Min Price"
+                  class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+                  formControlName="priceFrom"
+                />
+              </div>
+              <div class="flex-1">
+                <label class="block text-gray-700 font-medium mb-1"
+                  >Price To</label
+                >
+                <input
+                  type="number"
+                  placeholder="Max Price"
+                  class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+                  formControlName="priceTo"
+                />
+              </div>
+            </div>
+            <!-- Mileage Range -->
+            <div class="flex gap-2">
+              <div class="flex-1">
+                <label class="block text-gray-700 font-medium mb-1"
+                  >Mileage From</label
+                >
+                <input
+                  type="number"
+                  placeholder="Min Mileage"
+                  class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+                  formControlName="mileageFrom"
+                />
+              </div>
+              <div class="flex-1">
+                <label class="block text-gray-700 font-medium mb-1"
+                  >Mileage To</label
+                >
+                <input
+                  type="number"
+                  placeholder="Max Mileage"
+                  class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+                  formControlName="mileageTo"
+                />
+              </div>
+            </div>
+            <!-- Year Range -->
+            <div class="flex gap-2">
+              <div class="flex-1">
+                <label class="block text-gray-700 font-medium mb-1"
+                  >Year From</label
+                >
+                <input
+                  type="number"
+                  placeholder="Min Year"
+                  class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+                  formControlName="yearFrom"
+                />
+              </div>
+              <div class="flex-1">
+                <label class="block text-gray-700 font-medium mb-1"
+                  >Year To</label
+                >
+                <input
+                  type="number"
+                  placeholder="Max Year"
+                  class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+                  formControlName="yearTo"
+                />
+              </div>
+            </div>
+            <!-- Lagerdagar Range -->
+            <div class="flex gap-2">
+              <div class="flex-1">
+                <label class="block text-gray-700 font-medium mb-1"
+                  >Lagerdagar From</label
+                >
+                <input
+                  type="number"
+                  placeholder="Min Lagerdagar"
+                  class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+                  formControlName="lagerFrom"
+                />
+              </div>
+              <div class="flex-1">
+                <label class="block text-gray-700 font-medium mb-1"
+                  >Lagerdagar To</label
+                >
+                <input
+                  type="number"
+                  placeholder="Max Lagerdagar"
+                  class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+                  formControlName="lagerTo"
+                />
+              </div>
+            </div>
+            <!-- Gearbox Dropdown -->
+            <div>
+              <label class="block text-gray-700 font-medium mb-1"
+                >Gearbox</label
+              >
+              <app-custom-select
+                formControlName="gearbox"
+                [options]="gearboxOptions"
+                placeholder="Select Gearbox"
+              ></app-custom-select>
+            </div>
+            <!-- Drivmedel Dropdown -->
+            <div>
+              <label class="block text-gray-700 font-medium mb-1"
+                >Fuel Type</label
+              >
+              <app-custom-select
+                formControlName="drivmedel"
+                [options]="fuelTypeOptions"
+                placeholder="Select Fuel Type"
+              ></app-custom-select>
+            </div>
+          </div>
+          <!-- Actions -->
+          <div class="flex justify-between p-6 border-t flex-shrink-0">
+            <button
+              type="button"
+              (click)="resetFilterPanel()"
+              class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
+            >
+              Reset
+            </button>
+            <button
+              type="button"
+              (click)="applyFilterPanel()"
+              class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80 transition"
+            >
+              Apply Filter
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Vehicle Modal -->
+  <div
+    *ngIf="isVisible"
+    class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
+    @modalAnimation
+  >
+    <div
+      class="bg-white rounded-xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto border border-gray-200 relative shadow-xl"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        (click)="isVisible = false"
+        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl"
+      >
+        <i class="ri-close-line"></i>
+      </button>
+      <h2 class="text-2xl font-bold text-gray-900 mb-1">Add Vehicle</h2>
+      <p class="text-gray-500 mb-6">
+        Enter a registration number
+      </p>
+      <!-- Tab Switcher -->
+     
+      <!-- Registration Number Tab -->
+      <form
+        [formGroup]="vehicleForm"
+        (ngSubmit)="onSubmit()"
+      >
+        <div class="mb-6">
+          <label
+            class="block text-gray-900 text-base font-semibold mb-2"
+            for="regNumber"
+            >Vehicle Registration Number</label
+          >
+          <input
+            type="text"
+            id="regNumber"
+            formControlName="vehicleId"
+            placeholder="Enter registration number"
+            [class.border-red]="
+              vehicleForm.get('vehicleId')?.touched &&
+              vehicleForm.get('vehicleId')?.invalid
+            "
+            class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+          />
+          <div
+            *ngIf="
+              vehicleForm.get('vehicleId')?.touched &&
+              vehicleForm.get('vehicleId')?.invalid
+            "
+            class="text-red text-sm mt-1"
+          >
+            Registration number is required
+          </div>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button
+            type="button"
+            (click)="vehicleForm.reset()"
+            class="px-5 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
+          >
+            Reset
+          </button>
+          <button
+            type="submit"
+            [disabled]="vehicleForm.invalid || addingVehicle"
+            class="px-5 py-2 rounded-md bg-primary text-white font-semibold hover:bg-primary/80 transition flex items-center gap-2"
+          >
+            <svg
+              *ngIf="addingVehicle"
+              class="animate-spin h-4 w-4"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            {{ addingVehicle ? "Adding Vehicle..." : "Add Vehicle" }}
+          </button>
+        </div>
+      </form>
+      <!-- Import Excel Tab
+      <div *ngIf="activeTab === 'excel'">
+        <div class="mb-6">
+          <div
+            class="border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center py-10 bg-gray-50 text-center"
+          >
+            <i class="ri-file-list-3-line text-4xl text-gray-400 mb-2"></i>
+            <p class="text-gray-500 mb-4">
+              Drag and drop your Excel file, or click to select
+            </p>
+            <label class="inline-block cursor-pointer">
+              <input
+                #importFile
+                type="file"
+                accept=".xlsx, .xls"
+                style="display: none"
+              />
+              <span
+                class="px-4 py-2 bg-primary text-white rounded-md flex items-center gap-2 hover:bg-primary/80 transition"
+              >
+                <i class="ri-upload-2-line"></i> Select File
+              </span>
+            </label>
+          </div>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button
+            type="button"
+            class="px-5 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
+          >
+            Reset
+          </button>
+          <button
+            type="button"
+            (click)="showComingSoon()"
+            class="px-5 py-2 rounded-md bg-primary text-white font-semibold hover:bg-primary/80 transition"
+          >
+            Import
+          </button>
+        </div>
+      </div> -->
+    </div>
+  </div>
+
+  <!-- Advanced Search Filters (collapsed by default) -->
+  <div
+    *ngIf="showAdvancedSearch"
+    class="bg-white rounded-lg shadow p-4 mb-6 overflow-x-auto"
+  >
+    <form [formGroup]="filterForm" class="flex gap-4 min-w-max">
+      <div>
+        <label class="text-sm font-medium mb-1 block">From</label>
+        <input
+          type="date"
+          formControlName="from"
+          class="form-input w-full rounded-md border border-gray-200 px-3 py-2"
+        />
+      </div>
+      <div>
+        <label class="text-sm font-medium mb-1 block">To</label>
+        <input
+          type="date"
+          formControlName="to"
+          class="form-input w-full rounded-md border border-gray-200 px-3 py-2"
+        />
+      </div>
+      <!-- Add more filter fields as needed -->
+    </form>
+  </div>
+
+  <!-- Vehicles Table -->
+  <div
+    class="rounded-xl shadow overflow-hidden border border-primary/10 bg-white"
+  >
+    <div class="overflow-x-auto relative">
+      <!-- Loading Error Message -->
+      <div *ngIf="loadingError" class="p-4 text-center text-red bg-red">
+        {{ loadingError }}
+        <button
+          (click)="loadVehicles()"
+          class="ml-2 text-primary hover:underline"
+        >
+          Try Again
+        </button>
+      </div>
+      <!-- Skeleton Loading -->
+      <table
+        *ngIf="loading"
+        class="min-w-full rounded-xl overflow-hidden bg-white shadow"
+      >
+        <thead>
+          <tr>
+            <th class="w-10 px-6 py-3"></th>
+            <th
+              *ngFor="let col of selectedColumns"
+              class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+            >
+              <div class="h-4 w-24 bg-gray-200 rounded"></div>
+            </th>
+            <th
+              class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider"
+            >
+              <div class="h-4 w-10 bg-gray-200 rounded"></div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let i of [1, 2, 3, 4, 5]"
+            class="border-b last:border-b-0 animate-pulse"
+          >
+            <td class="text-center px-2 py-4">
+              <div class="h-6 w-6 bg-gray-200 rounded"></div>
+            </td>
+            <td *ngFor="let col of selectedColumns" class="px-4 py-4">
+              <div class="h-4 w-32 bg-gray-200 rounded"></div>
+            </td>
+            <td class="px-4 py-4 text-right">
+              <div class="h-6 w-10 bg-gray-200 rounded"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- Actual Content -->
+      <table
+        *ngIf="!loading"
+        class="min-w-full rounded-xl overflow-hidden bg-white shadow"
+      >
+        <thead>
+          <tr>
+            <th class="w-10 px-6 py-3"></th>
+            <th
+              *ngFor="let col of selectedColumns"
+              class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+            >
+              {{ col }}
+            </th>
+            <th
+              class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider"
+            >
+              <button
+                (click)="showColumnSettings = true"
+                class="text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                <i class="ri-settings-3-line text-xl"></i>
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Not found state -->
+          <tr *ngIf="!loading && paginatedVehicles.length === 0">
+            <td
+              [attr.colspan]="selectedColumns.length + 2"
+              class="text-center py-8 text-gray-500"
+            >
+              No vehicles found.
+            </td>
+          </tr>
+          <ng-container *ngIf="!loading">
+            <ng-container
+              *ngFor="let vehicle of paginatedVehicles; let i = index"
+            >
+              <tr
+                class="border-b last:border-b-0 hover:bg-gray-50 cursor-pointer select-none text-gray-900"
+                (click)="toggleAccordion(getRowKey(vehicle, i), vehicle)"
+              >
+                <td class="text-center px-2">
+                  <button
+                    class="flex items-center justify-center text-gray-500 text-2xl"
+                    [ngClass]="{
+                      'rotate-90 text-primary':
+                        expandedRowKey === getRowKey(vehicle, i)
+                    }"
+                    aria-label="Expand details"
+                  >
+                    <i class="ri-arrow-right-s-line"></i>
+                  </button>
+                </td>
+                <td
+                  *ngFor="let col of selectedColumns"
+                  class="px-4 py-4 text-gray-900"
+                >
+                  @switch (col) { @case ('Reg nr') {
+                  <div class="flex items-center">
+                    <div
+                      class="flex rounded-full border border-gray-300 overflow-hidden shadow-sm items-center"
+                      style="min-width: 60px"
+                    >
+                      <span
+                        class="flex items-center justify-center bg-primary text-white font-medium text-sm w-6 h-6"
+                        style="
+                          border-top-left-radius: 9999px;
+                          border-bottom-left-radius: 9999px;
+                        "
+                        >R</span
+                      >
+                      <span
+                        class="flex items-center px-2 font-medium text-black text-sm bg-white h-6"
+                        style="
+                          border-top-right-radius: 9999px;
+                          border-bottom-right-radius: 9999px;
+                        "
+                        >{{ vehicle?.registrationData?.registrationNumber || 'N/A' }}</span
+                      >
+                    </div>
+                  </div>
+                  } @case ('Brand') {
+                  <span class="text-primary font-medium">
+                    {{ vehicle?.detail?.vehicleBrandRaw || vehicle?.detail?.vehicleBrand || 'N/A' }}
+                  </span>
+                  } @case ('Model') {
+                  {{ vehicle?.detail?.vehicleModelRaw || vehicle?.detail?.vehicleModel || 'N/A' }}
+                  } @case ('Year') {
+                  {{ vehicle?.detail?.vehicleYear || 'N/A' }}
+                  } @case ('Color') {
+                  {{ vehicle?.detail?.color || 'N/A' }}
+                  } @case ('Type') {
+                  <span
+                    class="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700"
+                  >
+                    {{ vehicle?.detail?.vehicleType || 'N/A' }}
+                  </span>
+                  } @case ('Status') {
+                  <span
+                    class="px-2 py-0.5 rounded-full text-xs font-medium"
+                    [ngClass]="getStatusColor(vehicle?.status?.code)"
+                  >
+                    {{ getStatusDisplay(vehicle?.status?.code) }}
+                  </span>
+                  } @default {
+                  {{ vehicle[col] || "N/A" }}
+                  } }
+                </td>
+                <td class="px-4 py-4 text-right">
+                  <!-- Always-visible delete button -->
+                  <button
+                    class="text-red-600 hover:text-red-800"
+                    title="Delete"
+                    (click)="
+                      $event.stopPropagation();
+                      expandedVehicle = vehicle;
+                      openDeleteModal()
+                    "
+                  >
+                    <i class="ri-delete-bin-line text-2xl"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="expandedRowKey === getRowKey(vehicle, i)">
+                <td [attr.colspan]="selectedColumns.length + 2" class="bg-gray-50 p-0">
+                  <!-- Vehicle Details -->
+                  <div class="p-0" @fadeInOut>
+                    <!-- Action buttons -->
+                    <div
+                      class="flex flex-wrap gap-2 px-6 py-4 border-b border-gray-200 bg-white"
+                    >
+                      <button
+                        class="bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg border border-gray-200 flex items-center gap-2"
+                        routerLink="/dashboard/agreements/purchase"
+                      >
+                        <i class="ri-file-list-3-line"></i> Purchase
+                      </button>
+                      <button
+                        class="bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg border border-gray-200 flex items-center gap-2"
+                        routerLink="/dashboard/agreements/sales"
+                      >
+                        <i class="ri-money-dollar-circle-line"></i> Sale
+                      </button>
+                      <button
+                        class="bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg border border-gray-200 flex items-center gap-2"
+                        routerLink="/dashboard/agreements/agency"
+                      >
+                        <i class="ri-file-paper-line"></i> Intermediation
+                      </button>
+                      <button
+                        class="bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg border border-gray-200 flex items-center gap-2"
+                        routerLink="/dashboard/agreements/receipt"
+                      >
+                        <i class="ri-bank-card-line"></i> Swisha
+                      </button>
+                      <button
+                        class="bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg border border-gray-200 flex items-center gap-2"
+                        routerLink="/dashboard/invoices/add"
+                      >
+                        <i class="ri-bill-line"></i> Invoice
+                      </button>
+                      <button
+                        class="bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg border border-gray-200 flex items-center gap-2"
+                      >
+                        <i class="ri-megaphone-line"></i> Advertise
+                      </button>
+                      <!-- Add delete button in expanded view for convenience -->
+                      <button
+                        class="bg-white hover:bg-gray-50 text-red font-medium py-2 px-4 rounded-lg border border-gray-200 flex items-center gap-2"
+                        (click)="
+                          $event.stopPropagation();
+                          expandedVehicle = vehicle;
+                          openDeleteModal()
+                        "
+                      >
+                        <i class="ri-delete-bin-line"></i> Delete
+                      </button>
+                    </div>
+
+                    <!-- Vehicle detail panels -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
+                      <!-- Vehicle Details Section -->
+                      <div
+                        class="bg-white rounded-xl border border-gray-200 overflow-hidden h-[577px]"
+                      >
+                        <!-- Fixed Header -->
+                        <div
+                          class="bg-gray-50 px-6 py-4 flex items-center sticky top-0 z-10"
+                        >
+                          <h3 class="text-lg font-medium text-gray-700">
+                            {{ expandedVehicle.detail?.vehicleBrandRaw }}
+                          </h3>
+                          <div
+                            class="ml-auto flex rounded-full border border-gray-300 overflow-hidden shadow-sm items-center"
+                            style="min-width: 60px"
+                          >
+                            <span
+                              class="flex items-center justify-center bg-primary text-white font-medium text-sm w-6 h-6"
+                              style="
+                                border-top-left-radius: 9999px;
+                                border-bottom-left-radius: 9999px;
+                              "
+                              >R</span
+                            >
+                            <span
+                              class="flex items-center px-2 font-medium text-black text-sm bg-white h-6"
+                              style="
+                                border-top-right-radius: 9999px;
+                                border-bottom-right-radius: 9999px;
+                              "
+                              >{{ expandedVehicle?.registrationData?.registrationNumber || 'N/A' }}</span
+                            >
+                          </div>
+                        </div>
+
+                        <!-- Scrollable Content -->
+                        <div class="overflow-y-auto h-full pb-4">
+                          <!-- Basic Information -->
+                          <div class="px-6 py-4 border-b border-gray-100">
+                            <h4
+                              class="text-md font-semibold text-gray-600 mb-3"
+                            >
+                              Basic Information
+                            </h4>
+                            <div class="grid grid-cols-3 gap-y-3 text-sm">
+                              <div>
+                                <div class="text-gray-500 mb-1">Model</div>
+                                <div class="font-medium">
+                                  {{ vehicle?.detail?.vehicleModelRaw || vehicle?.detail?.vehicleModel || 'N/A' }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">Year</div>
+                                <div class="font-medium">
+                                  {{ vehicle?.detail?.vehicleYear || 'N/A' }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">Type</div>
+                                <span
+                                  class="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700"
+                                >
+                                  {{ vehicle?.detail?.vehicleType || 'N/A' }}
+                                </span>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">Category</div>
+                                <div class="font-medium">
+                                  {{ vehicle?.detail?.vehicleCategory || 'N/A' }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">Color</div>
+                                <div class="font-medium">
+                                  {{ vehicle?.detail?.color || 'N/A' }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">Status</div>
+                                <span
+                                  class="px-2 py-0.5 rounded-full text-xs font-medium"
+                                  [ngClass]="getStatusColor(vehicle?.status?.code)"
+                                >
+                                  {{ getStatusDisplay(vehicle?.status?.code) }}
+                                </span>
+                              </div>
+                              <div class="col-span-2">
+                                <div class="text-gray-500 mb-1">
+                                  Chassis Number
+                                </div>
+                                <div class="font-medium text-xs">
+                                  {{ vehicle?.detail?.chassisNumber || 'N/A' }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Days in Stock
+                                </div>
+                                <div class="font-medium">
+                                  {{
+                                    calculateDaysInStock(
+                                      vehicle.createdAt
+                                    )
+                                  }}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Registration & Dates -->
+                          <div class="px-6 py-4 border-b border-gray-100">
+                            <h4
+                              class="text-md font-semibold text-gray-600 mb-3"
+                            >
+                              Registration & Dates
+                            </h4>
+                            <div class="grid grid-cols-2 gap-y-3 text-sm">
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Registration Date
+                                </div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.registrationData
+                                      .registeredOn | date : "dd/MM/yyyy"
+                                  }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Pre-Registration Date
+                                </div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.origin?.preRegistrationDate
+                                      | date : "dd/MM/yyyy"
+                                  }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Registration Reused
+                                </div>
+                                <span
+                                  class="px-2 py-0.5 rounded-full text-xs font-medium"
+                                  [ngClass]="
+                                    vehicle.detail
+                                      ?.registrationNumberReused
+                                      ? 'bg-orange-100 text-orange-700'
+                                      : 'bg-gray-100 text-gray-700'
+                                  "
+                                >
+                                  {{
+                                    vehicle.detail
+                                      ?.registrationNumberReused
+                                      ? "Yes"
+                                      : "No"
+                                  }}
+                                </span>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Status Date
+                                </div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.status?.date
+                                      | date : "dd/MM/yyyy"
+                                  }}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Technical Specifications -->
+                          <div class="px-6 py-4 border-b border-gray-100">
+                            <h4
+                              class="text-md font-semibold text-gray-600 mb-3"
+                            >
+                              Technical Specifications
+                            </h4>
+                            <div class="grid grid-cols-3 gap-y-3 text-sm">
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Engine Volume
+                                </div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.technicalData
+                                      ?.cylinderVolume || "N/A"
+                                  }}
+                                  cc
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">Gearbox</div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.technicalData?.gearbox ||
+                                      "N/A"
+                                  }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">Max Speed</div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.technicalData?.maxSpeed ||
+                                      "N/A"
+                                  }}
+                                  km/h
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Service Weight
+                                </div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.technicalData
+                                      ?.serviceWeight || "N/A"
+                                  }}
+                                  kg
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Total Weight
+                                </div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.technicalData
+                                      ?.totalWeight || "N/A"
+                                  }}
+                                  kg
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Vehicle Weight
+                                </div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.technicalData
+                                      ?.vehicleTypeWeight || "N/A"
+                                  }}
+                                  kg
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">Passengers</div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.technicalData
+                                      ?.nrOfPassengers || "N/A"
+                                  }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">Fuel Type</div>
+                                <div class="font-medium">
+                                  {{ vehicle.technicalData?.fuelCodes?.[0] || 'N/A' }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  All Wheel Drive
+                                </div>
+                                <span
+                                  class="px-2 py-0.5 rounded-full text-xs font-medium"
+                                  [ngClass]="
+                                    vehicle.technicalData?.allWheelDrive
+                                      ? 'bg-green-100 text-green-700'
+                                      : 'bg-gray-100 text-gray-700'
+                                  "
+                                >
+                                  {{
+                                    vehicle.technicalData?.allWheelDrive
+                                      ? "Yes"
+                                      : "No"
+                                  }}
+                                </span>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">Variant</div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.technicalData?.variant ||
+                                      "N/A"
+                                  }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">Version</div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.technicalData?.version ||
+                                      "N/A"
+                                  }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">Type Code</div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.technicalData?.type || "N/A"
+                                  }}
+                                </div>
+                              </div>
+                              <div class="col-span-3">
+                                <div class="text-gray-500 mb-1">
+                                  EEG Certificate
+                                </div>
+                                <div class="font-medium text-xs">
+                                  {{
+                                    vehicle.technicalData?.eeg || "N/A"
+                                  }}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Ownership Information -->
+                          <div class="px-6 py-4 border-b border-gray-100">
+                            <h4
+                              class="text-md font-semibold text-gray-600 mb-3"
+                            >
+                              Ownership Information
+                            </h4>
+                            <div class="grid grid-cols-2 gap-y-3 text-sm">
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Current Owner
+                                </div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.ownerInfo?.owner || "N/A"
+                                  }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Acquisition Date
+                                </div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.ownerInfo?.acquisitionDate
+                                      | date : "dd/MM/yyyy"
+                                  }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Total Owners
+                                </div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.ownerInfo?.numberOfUsers ||
+                                      "N/A"
+                                  }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Organization Owner
+                                </div>
+                                <span
+                                  class="px-2 py-0.5 rounded-full text-xs font-medium"
+                                  [ngClass]="
+                                    vehicle.ownerInfo?.organization
+                                      ? 'bg-blue-100 text-blue-700'
+                                      : 'bg-gray-100 text-gray-700'
+                                  "
+                                >
+                                  {{
+                                    vehicle.ownerInfo?.organization
+                                      ? "Yes"
+                                      : "No"
+                                  }}
+                                </span>
+                              </div>
+                              
+                            </div>
+                          </div>
+                          <!-- Inspection Details -->
+                          <div class="px-6 py-4 border-b border-gray-100">
+                            <h4
+                              class="text-md font-semibold text-gray-600 mb-3"
+                            >
+                              Inspection Details
+                            </h4>
+                            <div class="grid grid-cols-2 gap-y-3 text-sm">
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Last Inspection
+                                </div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.inspection?.inspectionDate
+                                      | date : "dd/MM/yyyy"
+                                  }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Next Inspection Due
+                                </div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.inspection
+                                      ?.inspectionDateUpToAndIncluding
+                                      | date : "dd/MM/yyyy"
+                                  }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Inspection Mileage
+                                </div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.inspection?.mileage || "N/A"
+                                  }}
+                                  km
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Inspection Station
+                                </div>
+                                <div class="font-medium text-xs">
+                                  {{
+                                    vehicle.inspection
+                                      ?.inspectionStation || "N/A"
+                                  }}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Import & Origin -->
+                          <div class="px-6 py-4 border-b border-gray-100">
+                            <h4
+                              class="text-md font-semibold text-gray-600 mb-3"
+                            >
+                              Import & Origin
+                            </h4>
+                            <div class="grid grid-cols-2 gap-y-3 text-sm">
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Importer ID
+                                </div>
+                                <div class="font-medium">
+                                  {{
+                                    vehicle.origin?.importerId || "N/A"
+                                  }}
+                                </div>
+                              </div>
+                              <div>
+                                <div class="text-gray-500 mb-1">
+                                  Direct Import
+                                </div>
+                                <span
+                                  class="px-2 py-0.5 rounded-full text-xs font-medium"
+                                  [ngClass]="
+                                    vehicle.origin?.directImport
+                                      ? 'bg-blue-100 text-blue-700'
+                                      : 'bg-gray-100 text-gray-700'
+                                  "
+                                >
+                                  {{
+                                    vehicle.origin?.directImport
+                                      ? "Yes"
+                                      : "No"
+                                  }}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+
+                      <!-- Right column - Notes & Documents -->
+                      <div class="col-span-1 space-y-6">
+                        <!-- Vehicle information -->
+                        <div
+                          class="bg-white rounded-xl border border-gray-200 overflow-hidden"
+                        >
+                          <div class="bg-gray-50 px-6 py-4">
+                            <h3 class="text-lg font-medium text-gray-700">
+                              Vehicle Information
+                            </h3>
+                          </div>
+                          <div class="p-6">
+                            <ng-container *ngIf="vehicle.agreementHistory && vehicle.agreementHistory.length > 0; else noAgreementHistory">
+                              <div class="overflow-y-auto" style="height: 230px;">
+                                <div *ngFor="let agreement of vehicle.agreementHistory" class="border rounded-lg p-4 mb-4 bg-gray-50 min-w-full">
+                                  <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                                    <div><span class="text-gray-600">Agreement Type:</span> <span class="font-medium text-gray-900">{{ agreement.agreementType }}</span></div>
+                                    <div><span class="text-gray-600">Agreement ID:</span> <span class="font-medium text-gray-900">{{ agreement.agreement_id }}</span></div>
+                                    <div><span class="text-gray-600">Buyer Name:</span> <span class="font-medium text-gray-900">{{ agreement.buyerName }}</span></div>
+                                    <div><span class="text-gray-600">Base Price:</span> <span class="font-medium text-gray-900">{{ agreement.basePrice }}</span></div>
+                                    <div><span class="text-gray-600">Purchase Price:</span> <span class="font-medium text-gray-900">{{ agreement.purchasePrice }}</span></div>
+                                    <div><span class="text-gray-600">VAT Status:</span> <span class="font-medium text-gray-900">{{ agreement.vatStatus }}</span></div>
+                                    <div><span class="text-gray-600">Credit Leasing:</span> <span class="font-medium text-gray-900">{{ agreement.creditLeasing }}</span></div>
+                                    <div><span class="text-gray-600">Deck:</span> <span class="font-medium text-gray-900">{{ agreement.deck }}</span></div>
+                                    <div><span class="text-gray-600">Delivery Terms:</span> <span class="font-medium text-gray-900">{{ agreement.deliveryTerms }}</span></div>
+                                    <div><span class="text-gray-600">Delivery Location:</span> <span class="font-medium text-gray-900">{{ agreement.deliveryLocation }}</span></div>
+                                    <div><span class="text-gray-600">Inspection Date:</span> <span class="font-medium text-gray-900">{{ agreement.inspectionDate ? (agreement.inspectionDate | date:'dd/MM/yyyy') : 'N/A' }}</span></div>
+                                  </div>
+                                </div>
+                              </div>
+                            </ng-container>
+                            <ng-template #noAgreementHistory>
+                              <div class="text-center text-gray-500 h-52 flex items-center justify-center">
+                                No agreement history available.
+                              </div>
+                            </ng-template>
+                          </div>
+                        </div>
+                        <!-- Notes -->
+                        <div
+                          class="bg-white rounded-xl border border-gray-200 overflow-hidden"
+                        >
+                          <div
+                            class="bg-gray-50 px-6 py-4 flex justify-between items-center"
+                          >
+                            <h3 class="text-lg font-medium text-gray-700">
+                              Notes
+                            </h3>
+                            <button
+                              class="bg-white border border-gray-200 text-primary px-3 py-1.5 rounded-md text-sm font-medium flex items-center shadow-sm"
+                              (click)="openNoteModal()"
+                            >
+                              <i class="ri-add-line mr-1"></i> Add Note
+                            </button>
+                          </div>
+                          <div class="p-4 h-36 overflow-y-auto">
+                            <ng-container
+                              *ngIf="
+                                vehicle?.notes &&
+                                  vehicle.notes.length > 0;
+                                else noNotes
+                              "
+                            >
+                              <div class="space-y-3">
+                                <div
+                                  *ngFor="let note of vehicle.notes"
+                                  class="border border-gray-200 rounded-lg p-3 bg-white hover:shadow-sm transition-shadow flex flex-col h-full"
+                                >
+                                  <div class="flex justify-between items-start mb-2">
+                                    <h4 class="text-xs font-semibold text-gray-900 truncate max-w-[70%]">
+                                      {{ note.title || "Untitled Note" }}
+                                    </h4>
+                                    <div class="flex items-center space-x-1">
+                                      <span *ngIf="note.isPrivate" class="text-[10px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded-full">Private</span>
+                                      <button class="text-gray-500 hover:text-primary ml-2" (click)="editNote(note)" title="Edit Note"><i class="ri-edit-line"></i></button>
+                                      <button class="text-gray-500 hover:text-red ml-1" (click)="deleteNote(note._id)" title="Delete Note"><i class="ri-delete-bin-line"></i></button>
+                                    </div>
+                                  </div>
+                                  <p class="text-xs text-gray-700 line-clamp-2 mb-1 flex-1">{{ note.content }}</p>
+                                  <div class="flex justify-end mt-2">
+                                    <span class="text-[10px] text-gray-500">{{ note.uploadedAt | date : "shortDate" }}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </ng-container>
+
+                            <ng-template #noNotes>
+                              <div class="text-center text-gray-500 py-8">
+                                <i
+                                  class="ri-sticky-note-line text-4xl mb-4 text-gray-300"
+                                ></i>
+                                <p>No notes available for this vehicle</p>
+                              </div>
+                            </ng-template>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- Documents -->
+                      <div
+                        class="bg-white col-span-3 rounded-xl border border-gray-200 overflow-hidden"
+                      >
+                        <div
+                          class="bg-gray-50 px-6 py-4 flex justify-between items-center"
+                        >
+                          <h3 class="text-lg font-medium text-gray-700">
+                            Documents
+                          </h3>
+                          <button
+                            class="bg-white border border-gray-200 text-primary px-3 py-1.5 rounded-md text-sm font-medium flex items-center shadow-sm"
+                            (click)="triggerDocumentUpload()"
+                            [disabled]="uploadingDocument"
+                          >
+                            <i class="ri-upload-2-line mr-1"></i>
+                            {{ uploadingDocument ? "Uploading..." : "Upload" }}
+                          </button>
+                        </div>
+
+                        <div class="p-4">
+                          <ng-container
+                            *ngIf="
+                              vehicle?.media &&
+                                vehicle.media.length > 0;
+                              else noDocuments
+                            "
+                          >
+                            <div
+                              class="grid grid-cols-1 md:grid-cols-3 gap-4 max-h-[300px] overflow-y-auto"
+                            >
+                              <div
+                                *ngFor="let doc of vehicle.media"
+                                class="flex flex-col items-center p-4 border border-gray-200 rounded-lg bg-white hover:shadow-sm transition-shadow"
+                              >
+                                <div
+                                  class="flex items-center justify-between w-full mb-3"
+                                >
+                                  <div class="flex items-center min-w-0">
+                                    <i
+                                      class="ri-file-text-line text-primary mr-2 flex-shrink-0"
+                                    ></i>
+                                    <span
+                                      class="text-sm font-medium truncate max-w-full"
+                                    >
+                                      {{ doc.name }}
+                                    </span>
+                                  </div>
+                                  <div class="flex space-x-2 flex-shrink-0">
+                                    <button
+                                      class="text-gray-500 hover:text-primary"
+                                      (click)="viewDocument(doc)"
+                                      title="View Document"
+                                    >
+                                      <i class="ri-eye-line"></i>
+                                    </button>
+                                    <button
+                                      class="text-gray-500 hover:text-primary"
+                                      (click)="downloadDocument(doc)"
+                                      title="Download Document"
+                                    >
+                                      <i class="ri-download-line"></i>
+                                    </button>
+                                  </div>
+                                </div>
+                                <div class="w-full">
+                                  <div
+                                    class="text-xs text-gray-500 flex justify-between"
+                                  >
+                                    <span class="truncate max-w-[50%]">{{
+                                      doc.source || "Vehicle"
+                                    }}</span>
+                                    <span>{{
+                                      doc.uploadedAt | date : "shortDate"
+                                    }}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </ng-container>
+
+                          <ng-template #noDocuments>
+                            <div class="text-center text-gray-500 py-8">
+                              <i
+                                class="ri-file-text-line text-4xl mb-4 text-gray-300"
+                              ></i>
+                              <p>No media available for this vehicle</p>
+                            </div>
+                          </ng-template>
+                        </div>
+                      </div>
+
+                      <!-- Outlay panel -->
+                      <div
+                        class="bg-white col-span-3 rounded-xl border border-gray-200 overflow-hidden"
+                      >
+                        <div
+                          class="bg-gray-50 px-6 py-4 flex justify-between items-center"
+                        >
+                          <h3 class="text-lg font-medium text-gray-700">
+                            Outlay
+                          </h3>
+                          <button
+                            class="bg-white border border-gray-200 text-primary px-3 py-1.5 rounded-md text-sm font-medium flex items-center shadow-sm"
+                            (click)="openOutlayModal()"
+                          >
+                            <i class="ri-add-line mr-1"></i> Create
+                          </button>
+                        </div>
+                        <div class="p-4">
+                          <ng-container *ngIf="expandedVehicle?.outlay && expandedVehicle.outlay.length > 0; else noOutlays">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-h-[300px] overflow-y-auto">
+                              <div
+                                *ngFor="let outlay of expandedVehicle.outlay"
+                                class="flex flex-col p-4 border border-gray-200 rounded-lg bg-white hover:shadow-sm transition-shadow"
+                              >
+                                <div class="flex items-center justify-between w-full mb-3">
+                                  <div class="flex items-center min-w-0">
+                                    <i class="ri-money-dollar-circle-line text-primary mr-2 flex-shrink-0"></i>
+                                    <span class="text-sm font-medium truncate max-w-full">
+                                      {{ outlay.name }}
+                                    </span>
+                                  </div>
+                                  <div class="flex space-x-2 flex-shrink-0">
+                                    <button
+                                      class="text-gray-500 hover:text-primary"
+                                      (click)="openOutlayModal(outlay)"
+                                      title="Edit Outlay"
+                                    >
+                                      <i class="ri-edit-line"></i>
+                                    </button>
+                                    <button
+                                      class="text-gray-500 hover:text-red"
+                                      (click)="deleteOutlay(outlay._id)"
+                                      title="Delete Outlay"
+                                    >
+                                      <i class="ri-delete-bin-line"></i>
+                                    </button>
+                                  </div>
+                                </div>
+                                <div class="space-y-1 text-sm text-gray-600">
+                                  <div class="flex justify-between">
+                                    <span>Price:</span>
+                                    <span class="font-medium">{{ outlay.price }} kr</span>
+                                  </div>
+                                  <div class="flex justify-between">
+                                    <span>VAT:</span>
+                                    <span class="font-medium">{{ outlay.vat }} kr</span>
+                                  </div>
+                                  <div class="flex justify-between">
+                                    <span>Amount:</span>
+                                    <span class="font-medium">{{ outlay.amount }}</span>
+                                  </div>
+                                  <div class="flex justify-between">
+                                    <span>Date:</span>
+                                    <span class="font-medium">{{ outlay.date | date:'shortDate' }}</span>
+                                  </div>
+                                  <div class="pt-2 text-xs text-gray-500">
+                                    <p class="truncate">{{ outlay.description }}</p>
+                                    <p class="truncate">Seller: {{ outlay.sellerName }}</p>
+                                    <p class="truncate">Org: {{ outlay.organizationNumber }}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </ng-container>
+                          <ng-template #noOutlays>
+                            <div class="text-center text-gray-500 py-8">
+                              <i class="ri-money-dollar-circle-line text-4xl mb-4 text-gray-300"></i>
+                              <p>No expenses have been added yet</p>
+                            </div>
+                          </ng-template>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div
+    *ngIf="!loading && totalItems > 0"
+    class="mt-6 flex justify-between items-center"
+  >
+    <div class="text-sm text-gray-500">
+      Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to
+      {{
+        currentPage * itemsPerPage > totalItems
+          ? totalItems
+          : currentPage * itemsPerPage
+      }}
+      of {{ totalItems }} items
+    </div>
+    <nav aria-label="Pagination" class="flex space-x-1">
+      <button
+        [disabled]="currentPage === 1"
+        (click)="changePage(currentPage - 1)"
+        class="p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Previous page"
+      >
+        <i class="ri-arrow-left-s-line"></i>
+      </button>
+      <ng-container *ngFor="let page of getDisplayedPageNumbers()">
+        <button
+          (click)="changePage(page)"
+          [ngClass]="{
+            'bg-primary text-white hover:bg-primary/90': page === currentPage,
+            'bg-white text-gray-500 hover:bg-gray-50': page !== currentPage
+          }"
+          class="h-9 w-9 flex items-center justify-center rounded-full border border-gray-200"
+        >
+          {{ page }}
+        </button>
+      </ng-container>
+      <button
+        [disabled]="currentPage === totalPages || totalPages === 0"
+        (click)="changePage(currentPage + 1)"
+        class="p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Next page"
+      >
+        <i class="ri-arrow-right-s-line"></i>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div
+    *ngIf="showDeleteModal"
+    class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
+  >
+    <div
+      class="bg-white rounded-xl w-full max-w-md p-8 border border-gray-200 relative shadow-xl flex flex-col items-center"
+    >
+      <button
+        (click)="closeDeleteModal()"
+        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl"
+      >
+        <i class="ri-close-line"></i>
+      </button>
+      <i class="ri-delete-bin-line text-primary text-4xl mb-4"></i>
+      <h2 class="text-xl font-bold text-gray-900 mb-2">Delete Vehicle</h2>
+      <p class="text-gray-600 mb-6 text-center">
+        Are you sure you want to delete this vehicle? This action cannot be
+        undone.
+      </p>
+      <div class="flex gap-4 w-full justify-center">
+        <button
+          type="button"
+          (click)="closeDeleteModal()"
+          class="px-5 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          (click)="deleteVehicle()"
+          [disabled]="loading"
+          class="px-5 py-2 bg-primary text-white rounded-md hover:bg-primary/80 transition flex items-center gap-2"
+        >
+          <svg
+            *ngIf="loading"
+            class="animate-spin h-4 w-4"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          {{ loading ? "Deleting..." : "Delete" }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Column Settings Modal -->
+  <div
+    *ngIf="showColumnSettings"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  >
+    <div
+      class="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] flex flex-col"
+    >
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-6 border-b">
+        <h2 class="text-xl font-semibold">Column Settings</h2>
+        <button
+          (click)="showColumnSettings = false"
+          class="text-gray-500 hover:text-gray-700"
+        >
+          <i class="ri-close-line text-2xl"></i>
+        </button>
+      </div>
+
+      <!-- Modal Content -->
+      <div class="p-6 overflow-y-auto flex-1">
+        <div class="flex gap-8">
+          <!-- Available Columns -->
+          <div class="flex-1 flex flex-col min-h-0">
+            <h3 class="text-lg font-semibold mb-4">Available Columns</h3>
+            <div class="text-sm text-gray-500 mb-2">
+              Total: {{ availableColumns.length }}
+            </div>
+            <div class="overflow-y-auto flex-1 max-h-[250px]">
+              @for (col of availableColumns; track col) {
+              <div
+                class="flex items-center justify-between p-3 border-b last:border-b-0 hover:bg-gray-50"
+              >
+                <span class="text-gray-900">{{ col }}</span>
+                <button
+                  (click)="addColumn(col)"
+                  class="text-primary hover:text-primary-dark"
+                >
+                  <i class="ri-add-line text-xl"></i>
+                </button>
+              </div>
+              }
+            </div>
+          </div>
+
+          <!-- Selected Columns -->
+          <div class="flex-1 flex flex-col min-h-0">
+            <h3 class="text-lg font-semibold mb-4">Selected Columns</h3>
+            <div class="text-sm text-gray-500 mb-2">
+              Total: {{ selectedColumns.length }}
+            </div>
+            <div
+              class="overflow-y-auto flex-1 max-h-[250px]"
+              cdkDropList
+              #selectedList="cdkDropList"
+              [cdkDropListData]="selectedColumns"
+              (cdkDropListDropped)="onColumnDrop($event)"
+            >
+              @for (col of selectedColumns; track col) {
+              <div
+                class="flex items-center justify-between p-3 border-b last:border-b-0 hover:bg-gray-50"
+                cdkDrag
+              >
+                <div class="flex items-center gap-2">
+                  <i class="ri-drag-move-line text-gray-400"></i>
+                  <span class="text-gray-900">{{ col }}</span>
+                </div>
+                <button
+                  (click)="removeColumn($index)"
+                  class="text-gray-500 hover:text-gray-700"
+                >
+                  <i class="ri-close-line text-xl"></i>
+                </button>
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex justify-end gap-4 p-6 border-t">
+        <button
+          (click)="showColumnSettings = false"
+          class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition"
+        >
+          Cancel
+        </button>
+        <button
+          (click)="saveColumnSettings()"
+          class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
+        >
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Note Upload Modal -->
+  <div
+    *ngIf="showNoteModal"
+    class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
+  >
+    <div
+      class="bg-white rounded-xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto border border-gray-200 relative shadow-xl"
+    >
+      <button
+        (click)="showNoteModal = false"
+        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl"
+      >
+        <i class="ri-close-line"></i>
+      </button>
+      <h2 class="text-2xl font-bold text-gray-900 mb-1">{{ editingNoteId ? 'Edit Note' : 'Add Note' }}</h2>
+      <p class="text-gray-500 mb-6">{{ editingNoteId ? 'Edit this note for the vehicle' : 'Add a note to this vehicle' }}</p>
+
+      <form (ngSubmit)="submitNote()">
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium mb-2"
+            >Title (Optional)</label
+          >
+          <input
+            type="text"
+            [(ngModel)]="noteTitle"
+            name="noteTitle"
+            placeholder="Enter note title"
+            class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium mb-2"
+            >Note Content *</label
+          >
+          <textarea
+            [(ngModel)]="noteContent"
+            name="noteContent"
+            placeholder="Write your note here..."
+            class="w-full min-h-[150px] px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50 resize-y"
+            required
+          ></textarea>
+        </div>
+
+        <div class="mb-4">
+          <label class="flex items-center">
+            <input
+              type="checkbox"
+              [(ngModel)]="noteIsPrivate"
+              name="noteIsPrivate"
+              class="mr-2 form-checkbox text-primary rounded"
+            />
+            <span class="text-gray-700">Make this note private</span>
+          </label>
+        </div>
+
+        <div class="flex justify-end gap-2">
+          <button
+            type="button"
+            (click)="showNoteModal = false"
+            class="px-5 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            [disabled]="addingNote"
+            class="px-5 py-2 rounded-md bg-primary text-white font-semibold hover:bg-primary/80 transition flex items-center gap-2"
+          >
+            <svg
+              *ngIf="addingNote"
+              class="animate-spin h-4 w-4"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            {{ addingNote ? (editingNoteId ? 'Updating Note...' : 'Saving Note...') : (editingNoteId ? 'Update Note' : 'Save Note') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Outlay Modal -->
+  <div
+    *ngIf="showOutlayModal"
+    class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
+  >
+    <div
+      class="bg-white rounded-xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto border border-gray-200 relative shadow-xl"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        (click)="showOutlayModal = false"
+        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl"
+      >
+        <i class="ri-close-line"></i>
+      </button>
+      <h2 class="text-2xl font-bold text-gray-900 mb-1">{{ outlayId ? 'Edit Outlay' : 'Add Outlay' }}</h2>
+      <p class="text-gray-500 mb-6">Enter the details for the outlay</p>
+
+      <form (ngSubmit)="submitOutlay()">
+        <div class="grid grid-cols-2 gap-4">
+          <!-- Left Column -->
+          <div>
+            <div class="mb-4">
+              <label class="block text-gray-700 font-medium mb-2">Name</label>
+              <input
+                type="text"
+                [(ngModel)]="outlayData.name"
+                name="name"
+                placeholder="Enter name"
+                class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+                required
+              />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-700 font-medium mb-2">Seller Name</label>
+              <input
+                type="text"
+                [(ngModel)]="outlayData.sellerName"
+                name="sellerName"
+                placeholder="Enter seller name"
+                class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-700 font-medium mb-2">Organization Number</label>
+              <input
+                type="text"
+                [(ngModel)]="outlayData.organizationNumber"
+                name="organizationNumber"
+                placeholder="Enter organization number"
+                class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-700 font-medium mb-2">Address</label>
+              <input
+                type="text"
+                [(ngModel)]="outlayData.address"
+                name="address"
+                placeholder="Enter address"
+                class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-700 font-medium mb-2">Location</label>
+              <input
+                type="text"
+                [(ngModel)]="outlayData.location"
+                name="location"
+                placeholder="Enter location"
+                class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-700 font-medium mb-2">Post Number</label>
+              <input
+                type="text"
+                [(ngModel)]="outlayData.postNumber"
+                name="postNumber"
+                placeholder="Enter post number"
+                class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+              />
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div>
+            <div class="mb-4">
+              <label class="block text-gray-700 font-medium mb-2">Telephone Number</label>
+              <input
+                type="text"
+                [(ngModel)]="outlayData.telephoneNumber"
+                name="telephoneNumber"
+                placeholder="Enter telephone number"
+                class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-700 font-medium mb-2">Registration Number</label>
+              <input
+                type="text"
+                [(ngModel)]="outlayData.registrationNumber"
+                name="registrationNumber"
+                placeholder="Enter registration number"
+                class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-700 font-medium mb-2">Amount</label>
+              <input
+                type="number"
+                [(ngModel)]="outlayData.amount"
+                name="amount"
+                placeholder="Enter amount"
+                class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-700 font-medium mb-2">Date</label>
+              <input
+                type="date"
+                [(ngModel)]="outlayData.date"
+                name="date"
+                class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-700 font-medium mb-2">Price</label>
+              <input
+                type="number"
+                [(ngModel)]="outlayData.price"
+                name="price"
+                placeholder="Enter price"
+                class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-700 font-medium mb-2">VAT</label>
+              <input
+                type="number"
+                [(ngModel)]="outlayData.vat"
+                name="vat"
+                placeholder="Enter VAT"
+                class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Description at the bottom -->
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium mb-2">Description</label>
+          <textarea
+            [(ngModel)]="outlayData.description"
+            name="description"
+            placeholder="Write your description here..."
+            class="w-full min-h-[100px] px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+          ></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2">
+          <button
+            type="button"
+            (click)="showOutlayModal = false"
+            class="px-5 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            [disabled]="addingOutlay"
+            class="px-5 py-2 rounded-md bg-primary text-white font-semibold hover:bg-primary/80 transition flex items-center gap-2"
+          >
+            <svg
+              *ngIf="addingOutlay"
+              class="animate-spin h-4 w-4"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            {{ addingOutlay ? (outlayId ? 'Updating Outlay...' : 'Adding Outlay...') : (outlayId ? 'Update Outlay' : 'Add Outlay') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Hidden file input for document upload -->
+  <input
+    type="file"
+    #documentUploadInput
+    class="hidden"
+    (change)="onDocumentUpload($event)"
+    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+  />
+</div>

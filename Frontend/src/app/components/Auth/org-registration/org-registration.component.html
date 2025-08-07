@@ -1,0 +1,69 @@
+<div class="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 px-4 py-12">
+  <div class="max-w-2xl w-full space-y-8">
+    <div class="text-center">
+      <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-wide">Organization Registration</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Enter your organization details to complete registration</p>
+    </div>
+    <form class="mt-8 space-y-6" [formGroup]="orgForm" (ngSubmit)="onSubmit()">
+      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-300 dark:border-gray-600">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="md:col-span-2">
+            <label for="organization_number" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Organization Number *</label>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <div class="flex-grow">
+                <ng-container *ngIf="orgForm.get('organization_number') as orgNumberControl">
+                  <input id="organization_number" name="organization_number" type="text" formControlName="organization_number" class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-gray-900 dark:focus:border-white focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white" [ngClass]="{'border-red text-red': orgNumberControl.invalid && orgNumberControl.touched}">
+                  <div *ngIf="orgNumberControl.invalid && orgNumberControl.touched" class="text-red text-sm mt-1 ml-1">Organization number is required</div>
+                  <div *ngIf="orgNumberControl.errors && orgNumberControl.errors['orgSearch'] && orgNumberControl.touched" class="text-red text-sm mt-1 ml-1">Please search and select a valid organization.</div>
+                </ng-container>
+              </div>
+              <button type="button" (click)="onOrgSearch()" [disabled]="orgSearchLoading || !orgForm.get('organization_number')?.valid" class="px-4 py-3 min-w-[100px] text-sm font-medium rounded-lg text-white bg-gray-500 hover:bg-gray-600 focus:outline-none transition-all duration-300 disabled:opacity-50 h-[50px] flex items-center justify-center">
+                <span *ngIf="!orgSearchLoading">Search</span>
+                <span *ngIf="orgSearchLoading" class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+              </button>
+            </div>
+          </div>
+          <div>
+            <label for="corp_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Corporation Name *</label>
+            <input id="corp_name" name="corp_name" type="text" formControlName="corp_name" class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-gray-900 dark:focus:border-white focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white" [ngClass]="{'border-red text-red': orgForm.get('corp_name')?.invalid && orgForm.get('corp_name')?.touched}">
+            <div *ngIf="orgForm.get('corp_name')?.invalid && orgForm.get('corp_name')?.touched" class="text-red text-sm mt-1 ml-1">Corporation name is required</div>
+          </div>
+          <div>
+            <label for="company_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Email *</label>
+            <input id="company_email" name="company_email" type="email" formControlName="company_email" class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-gray-900 dark:focus:border-white focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white" [ngClass]="{'border-red text-red': orgForm.get('company_email')?.invalid && orgForm.get('company_email')?.touched}">
+            <div *ngIf="orgForm.get('company_email')?.invalid && orgForm.get('company_email')?.touched" class="text-red text-sm mt-1 ml-1">Valid company email is required</div>
+          </div>
+          <div>
+            <label for="company_phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Phone *</label>
+            <input id="company_phone" name="company_phone" type="tel" formControlName="company_phone" class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-gray-900 dark:focus:border-white focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white" [ngClass]="{'border-red text-red': orgForm.get('company_phone')?.invalid && orgForm.get('company_phone')?.touched}">
+            <div *ngIf="orgForm.get('company_phone')?.invalid && orgForm.get('company_phone')?.touched" class="text-red text-sm mt-1 ml-1">Company phone is required</div>
+          </div>
+          <div>
+            <label for="street_address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Street Address *</label>
+            <input id="street_address" name="street_address" type="text" formControlName="street_address" class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-gray-900 dark:focus:border-white focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white" [ngClass]="{'border-red text-red': orgForm.get('street_address')?.invalid && orgForm.get('street_address')?.touched}">
+            <div *ngIf="orgForm.get('street_address')?.invalid && orgForm.get('street_address')?.touched" class="text-red text-sm mt-1 ml-1">Street address is required</div>
+          </div>
+          <div>
+            <label for="registered_city" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Registered City *</label>
+            <input id="registered_city" name="registered_city" type="text" formControlName="registered_city" class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-gray-900 dark:focus:border-white focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white" [ngClass]="{'border-red text-red': orgForm.get('registered_city')?.invalid && orgForm.get('registered_city')?.touched}">
+            <div *ngIf="orgForm.get('registered_city')?.invalid && orgForm.get('registered_city')?.touched" class="text-red text-sm mt-1 ml-1">Registered city is required</div>
+          </div>
+          <div>
+            <label for="postal_code" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Postal Code *</label>
+            <input id="postal_code" name="postal_code" type="text" formControlName="postal_code" class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-gray-900 dark:focus:border-white focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white" [ngClass]="{'border-red text-red': orgForm.get('postal_code')?.invalid && orgForm.get('postal_code')?.touched}">
+            <div *ngIf="orgForm.get('postal_code')?.invalid && orgForm.get('postal_code')?.touched" class="text-red text-sm mt-1 ml-1">Postal code is required</div>
+          </div>
+          <div>
+            <label for="city" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City *</label>
+            <input id="city" name="city" type="text" formControlName="city" class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-gray-900 dark:focus:border-white focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white" [ngClass]="{'border-red text-red': orgForm.get('city')?.invalid && orgForm.get('city')?.touched}">
+            <div *ngIf="orgForm.get('city')?.invalid && orgForm.get('city')?.touched" class="text-red text-sm mt-1 ml-1">City is required</div>
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="w-full px-6 py-3 bg-primary text-white font-medium text-base tracking-wider rounded-lg transition-all duration-300 hover:bg-primary/90 border-2 border-primary relative h-[48px] flex items-center justify-center" [disabled]="loading">
+        <span *ngIf="loading" class="animate-spin mr-2 h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+        Complete Registration
+      </button>
+    </form>
+  </div>
+</div> 

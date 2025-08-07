@@ -1,0 +1,358 @@
+<!-- Profile Header Section -->
+<div class="w-full mx-auto px-4 py-8 min-h-screen">
+  <!-- Profile Image and Name Section -->
+  <div class="flex gap-8 items-center flex-wrap mb-10">
+    <div class="relative group">
+      <div class="w-32 h-32 rounded-full border-4 border-primary/20 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
+        <img
+          [src]="userData.profileImage || 'assets/images/default.png'"
+          class="w-full h-full object-cover"
+          (click)="openFileSelect()"
+          alt="profile-image"
+          appImageNotFound
+        />
+        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <i class="fas fa-camera text-white text-xl"></i>
+        </div>
+      </div>
+    </div>
+    <div class="flex-1">
+      <h1 class="text-3xl font-bold text-primary mb-2">
+        {{ userData.first_name + " " + userData.last_name }}
+      </h1>
+      <p class="text-gray-500">
+        Your account is ready to use
+      </p>
+    </div>
+  </div>
+
+  <!-- Theme Settings -->
+  <div *ngIf="showThemeSettings" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-6">
+    <div class="flex flex-col gap-4">
+      <h2 class="text-xl font-semibold text-primary">Theme Customization</h2>
+      
+      <!-- Color Picker Section -->
+      <div class="py-4">
+        <div class="flex justify-between items-center mb-3">
+          <div>
+            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary Color</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Select your preferred primary color</p>
+          </div>
+          <button (click)="resetToDefaultColor()" class="text-xs text-primary hover:underline">Reset to Default</button>
+        </div>
+        
+        <!-- Color Presets -->
+        <div class="flex flex-wrap gap-3 mb-4">
+          <button *ngFor="let color of predefinedColors" 
+                  [style.background-color]="color.value"
+                  (click)="setCustomColor(color.value)"
+                  class="w-8 h-8 rounded-full transition-all hover:scale-110 border border-gray-200 dark:border-gray-700"
+                  [ngClass]="{'ring-2 ring-offset-2 ring-gray-400': currentColor === color.value}"
+                  [attr.title]="color.name">
+          </button>
+          
+          <!-- Custom color picker -->
+          <div class="relative w-8 h-8">
+            <input 
+              type="color" 
+              id="custom-color-picker"
+              [(ngModel)]="customColorInput" 
+              (input)="setCustomColor(customColorInput)"
+              (change)="setCustomColor(customColorInput)"
+              class="absolute inset-0 w-8 h-8 opacity-0 cursor-pointer z-10" 
+            />
+            <div class="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden"
+                 [style.background-color]="customColorInput">
+              <i class="fas fa-plus text-white text-xs relative z-0"
+                 [style.text-shadow]="'0 0 3px rgba(0,0,0,0.5)'"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Current Color Display -->
+        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700">
+          <div class="flex items-center gap-3">
+            <div [style.background-color]="currentColor" class="w-6 h-6 rounded-full border border-gray-200 dark:border-gray-700"></div>
+            <span class="text-sm text-gray-700 dark:text-gray-300">{{ currentColor }}</span>
+          </div>
+          <button (click)="applyCustomColor()" 
+                  class="px-3 py-1 text-xs bg-primary text-white rounded-md hover:bg-primary-dark transition-colors border border-primary/20 flex items-center gap-2">
+            <i class="fas fa-check"></i>
+            Apply Color
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Website Logo Settings -->
+  <!-- <div *ngIf="showThemeSettings" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-6">
+    <div class="flex flex-col gap-4">
+      <h2 class="text-xl font-semibold text-primary">Website Logo</h2>
+      
+      <div class="py-4">
+        <div class="flex justify-between items-center mb-3">
+          <div>
+            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Current Logo</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Upload or update your website logo</p>
+          </div>
+        </div>
+        
+        <div class="flex flex-col md:flex-row gap-6 items-start">
+          <div class="w-full md:w-1/3">
+            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+              <div class="aspect-[16/9] relative rounded-lg overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <img 
+                  [src]="websiteLogo || 'assets/images/No_Image_Available.jpg'" 
+                  alt="Website Logo"
+                  class="w-full h-full object-contain"
+                />
+              </div>
+              <p class="text-xs text-gray-500 mt-2 text-center">Recommended size: 200x200px</p>
+            </div>
+          </div>
+
+          <div class="w-full md:w-2/3">
+            <div class="space-y-4">
+              <div class="flex flex-col gap-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Upload New Logo
+                </label>
+                <div class="flex items-center gap-4">
+                  <button 
+                    type="button"
+                    (click)="openLogoFileSelect()"
+                    class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-all border border-primary/20 flex items-center gap-2">
+                    <i class="fas fa-upload"></i>
+                    Choose File
+                  </button>
+                  <span class="text-sm text-gray-500" *ngIf="selectedLogoFile">
+                    {{ selectedLogoFile.name }}
+                  </span>
+                </div>
+                <p class="text-xs text-gray-500">
+                  Supported formats: PNG, JPG, SVG (Max size: 2MB)
+                </p>
+              </div>
+
+              <div class="flex gap-3 pt-4">
+                <button 
+                  type="button"
+                  [disabled]="!selectedLogoFile"
+                  (click)="uploadLogo()"
+                  class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-all disabled:opacity-50 border border-primary/20 flex items-center gap-2">
+                  <i class="fas fa-save"></i>
+                  Save Logo
+                </button>
+                <button 
+                  type="button"
+                  [disabled]="!websiteLogo"
+                  (click)="removeLogo()"
+                  class="px-4 py-2 text-red hover:bg-red rounded-lg transition-all disabled:opacity-50 border border-red flex items-center gap-2">
+                  <i class="fas fa-trash"></i>
+                  Remove Logo
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- Organization & Corporation Info Section -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-6">
+    <h2 class="text-xl font-semibold text-primary mb-4">Organization Information</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div *ngIf="userData.corp?.corp_name">
+        <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">Corporation Name</span>
+        <span class="block text-base text-gray-900 dark:text-white">{{ userData.corp?.corp_name || 'N/A' }}</span>
+      </div>
+      <div *ngIf="userData.organization?.organization_name">
+        <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">Organization Name</span>
+        <span class="block text-base text-gray-900 dark:text-white">{{ userData.organization?.organization_name || 'N/A' }}</span>
+      </div>
+      <div *ngIf="userData.organization?.organization_number">
+        <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">Organization Number</span>
+        <span class="block text-base text-gray-900 dark:text-white">{{ userData.organization?.organization_number || 'N/A' }}</span>
+      </div>
+      <div *ngIf="userData.organization?.organization_email">
+        <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">Organization Email</span>
+        <span class="block text-base text-gray-900 dark:text-white">{{ userData.organization?.organization_email || 'N/A' }}</span>
+      </div>
+      <div *ngIf="userData.organization?.organization_phone">
+        <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">Organization Phone</span>
+        <span class="block text-base text-gray-900 dark:text-white">{{ userData.organization?.organization_phone || 'N/A' }}</span>
+      </div>
+      <div *ngIf="userData.organization?.business_category">
+        <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">Business Category</span>
+        <span class="block text-base text-gray-900 dark:text-white">{{ userData.organization?.business_category || 'N/A' }}</span>
+      </div>
+      <div *ngIf="userData.organization?.legal_form">
+        <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">Legal Form</span>
+        <span class="block text-base text-gray-900 dark:text-white">{{ userData.organization?.legal_form || 'N/A' }}</span>
+      </div>
+      <div *ngIf="userData.organization?.company_email">
+        <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">Company Email</span>
+        <span class="block text-base text-gray-900 dark:text-white">{{ userData.organization?.company_email || 'N/A' }}</span>
+      </div>
+      <div *ngIf="userData.organization?.company_phone">
+        <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">Company Phone</span>
+        <span class="block text-base text-gray-900 dark:text-white">{{ userData.organization?.company_phone || 'N/A' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Form -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-semibold text-primary">Edit Profile</h2>
+    </div>
+
+    <form [formGroup]="profileForm" (ngSubmit)="onSave()">
+      <input type="file" id="profileImage" class="hidden" (change)="onFileChange($event)" formControlName="profileImage" />
+      
+      <div class="grid gap-6 md:grid-cols-2">
+        <div>
+          <label for="first_name" class="block text-sm font-medium text-main mb-1">First Name</label>
+          <input type="text" id="first_name" formControlName="first_name"
+                 class="w-full px-4 py-2.5 rounded-lg border border-primary/20 bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                 placeholder="Enter your first name" />
+        </div>
+
+        <div>
+          <label for="last_name" class="block text-sm font-medium text-main mb-1">Last Name</label>
+          <input type="text" id="last_name" formControlName="last_name"
+                 class="w-full px-4 py-2.5 rounded-lg border border-primary/20 bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                 placeholder="Enter your last name" />
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-medium text-main mb-1">Email Address</label>
+          <input type="email" id="email" formControlName="email"
+                 class="w-full px-4 py-2.5 rounded-lg border border-primary/20 bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                 placeholder="Enter your email" />
+        </div>
+
+        <div>
+          <label for="mobile" class="block text-sm font-medium text-main mb-1">Phone Number</label>
+          <input type="tel" id="mobile" formControlName="mobile"
+                 class="w-full px-4 py-2.5 rounded-lg border border-primary/20 bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                 placeholder="Enter your phone number" />
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap gap-4 mt-8 pt-6 border-t border-primary/10">
+        <button type="submit" 
+                class="px-6 py-2.5 bg-primary text-white rounded-lg hover:bg-primary-dark focus:ring-4 focus:ring-primary/20 transition-all border border-primary/20">
+          <ng-container *ngIf="loading; else buttonText">
+            <app-spinner></app-spinner>
+          </ng-container>
+          <ng-template #buttonText>Save Changes</ng-template>
+        </button>
+
+        <button type="button" 
+                class="px-6 py-2.5 text-primary rounded-lg hover:bg-primary/20 focus:ring-4 focus:ring-primary/20 transition-all border border-primary/20"
+                (click)="openChangePasswordModal()">
+          Change Password
+        </button>
+
+        <button type="button"
+                class="px-6 py-2.5 bg-red text-white rounded-lg hover:bg-red focus:ring-4 focus:ring-red/20 transition-all ml-auto border border-red/20"
+                (click)="openDeleteAccountModal()">
+          Delete Account
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div *ngIf="showPasswordModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4 animate-fadeIn">
+  <div class="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md p-6 border border-gray-200 dark:border-gray-700">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-semibold text-primary">Change Password</h3>
+      <button type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300" (click)="closeChangePasswordModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+      
+    <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="space-y-4">
+      <div>
+        <label for="currentPassword" class="block text-sm font-medium text-primary mb-1">Current Password</label>
+        <input type="password" id="currentPassword" formControlName="currentPassword"
+               class="w-full px-4 py-2.5 rounded-lg border border-primary/20 bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+      </div>
+
+      <div>
+        <label for="newPassword" class="block text-sm font-medium text-primary mb-1">New Password</label>
+        <input type="password" id="newPassword" formControlName="newPassword"
+               class="w-full px-4 py-2.5 rounded-lg border border-primary/20 bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+      </div>
+
+      <div>
+        <label for="confirmPassword" class="block text-sm font-medium text-primary mb-1">Confirm Password</label>
+        <input type="password" id="confirmPassword" formControlName="confirmPassword"
+               class="w-full px-4 py-2.5 rounded-lg border border-primary/20 bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+        <div *ngIf="passwordForm.hasError('mismatch')" class="mt-1 text-sm text-red">
+          Passwords do not match
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-6">
+        <button type="button" 
+                class="px-4 py-2 text-primary rounded-lg hover:bg-primary/20 transition-all border border-primary/20"
+                (click)="closeChangePasswordModal()">
+          Cancel
+        </button>
+        <button type="submit" 
+                [disabled]="!passwordForm.valid || loading"
+                class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-all disabled:opacity-50 border border-primary/20">
+          <ng-container *ngIf="loading; else changePasswordText">
+            <app-spinner></app-spinner>
+          </ng-container>
+          <ng-template #changePasswordText>Change Password</ng-template>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div *ngIf="showDeleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4 animate-fadeIn">
+  <div class="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md p-6 border border-gray-200 dark:border-gray-700">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-semibold text-red">Delete Account</h3>
+      <button type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300" (click)="closeDeleteAccountModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+      
+    <div class="space-y-4">
+      <div class="bg-red dark:bg-red/20 text-red dark:text-red p-4 rounded-lg border border-red/20 dark:border-red/30">
+        <i class="fas fa-exclamation-triangle mr-2"></i>
+        <span class="font-medium">Warning:</span> This action is irreversible
+      </div>
+      <p class="text-gray-600 dark:text-gray-300">Are you sure you want to delete your account? This action cannot be undone.</p>
+      <p class="text-gray-600 dark:text-gray-300">All your data will be permanently deleted.</p>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-6">
+      <button type="button" 
+              class="px-4 py-2 text-primary rounded-lg hover:bg-primary/20 transition-all border border-primary/20"
+              (click)="closeDeleteAccountModal()">
+        Cancel
+      </button>
+      <button type="button"
+              [disabled]="loading"
+              class="px-4 py-2 bg-red text-white rounded-lg hover:bg-red transition-all disabled:opacity-50 border border-red/20"
+              (click)="deleteAccount()">
+        <ng-container *ngIf="loading; else deleteText">
+          <app-spinner></app-spinner>
+        </ng-container>
+        <ng-template #deleteText>Delete Account</ng-template>
+      </button>
+    </div>
+  </div>
+</div>

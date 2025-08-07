@@ -1,0 +1,21 @@
+.circle {
+    border-radius   : 50%;
+    width           : 35px;
+    height          : 35px;
+    display         : flex;
+    justify-content : center;
+    align-items     : center;
+
+    img{
+        border-radius: 50%;
+        width        : 35px;
+        height       : 35px;
+    }
+
+    .initials {
+        color         : #FFFFFF;
+        font-size     : 12px;
+        line-height   : 19px;
+        letter-spacing: 0.2625px;
+    }
+}

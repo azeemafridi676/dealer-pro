@@ -1,0 +1,813 @@
+<div class="min-h-screen py-8 px-0">
+  <!-- Header -->
+  <div class=" mx-auto mb-6 flex items-center justify-between">
+    <button class="flex items-center gap-2 text-gray-500 hover:text-primary font-medium text-base bg-transparent border-none p-0" (click)="goBack()">
+      <i class="ri-arrow-left-line text-xl"></i> Back
+    </button>
+  </div>
+  <div class=" mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+    <!-- Left: Combined Form -->
+    <div class="bg-white rounded-2xl shadow p-8">
+      <h2 class="text-2xl font-bold mb-6">{{isEditMode ? 'Edit Sales Agreement' : 'Create Sales Agreement'}}</h2>
+      
+      <form [formGroup]="agreementForm" autocomplete="off">
+        <!-- Basic Information Section -->
+        <div class="font-semibold text-lg mb-4 mt-2">Basic Information</div>
+        <div class="mb-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Registration Number</label>
+            <div class="flex items-center gap-2">
+              <input type="text" formControlName="registrationNumber" placeholder="Registration number" class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+              <button type="button" (click)="searchVehicle()" [disabled]="vehicleSearching" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition flex items-center gap-2">
+                <svg *ngIf="vehicleSearching" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Search
+              </button>
+            </div>
+            <div *ngIf="agreementForm.get('registrationNumber')?.invalid && (agreementForm.get('registrationNumber')?.dirty || agreementForm.get('registrationNumber')?.touched)" class="text-red-500 text-sm mt-1">
+              {{ getErrorMessage(agreementForm, 'registrationNumber') }}
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Sales Date</label>
+            <input type="date" formControlName="salesDate" class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+            <div *ngIf="agreementForm.get('salesDate')?.invalid && (agreementForm.get('salesDate')?.dirty || agreementForm.get('salesDate')?.touched)" class="text-red-500 text-sm mt-1">
+              {{ getErrorMessage(agreementForm, 'salesDate') }}
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Customer Type</label>
+            <select formControlName="customerType" class="w-full px-4 py-2 border border-gray-200 rounded-lg">
+              <option value="">Select customer type</option>
+              <option value="Company">Company</option>
+              <option value="Private Individual">Private Individual</option>
+            </select>
+            <div *ngIf="agreementForm.get('customerType')?.invalid && (agreementForm.get('customerType')?.dirty || agreementForm.get('customerType')?.touched)" class="text-red-500 text-sm mt-1">
+              {{ getErrorMessage(agreementForm, 'customerType') }}
+            </div>
+          </div>
+
+          <!-- Company Fields -->
+          <ng-container *ngIf="agreementForm.get('customerType')?.value === 'Company'">
+          <div class="flex flex-col">
+              <label class="block font-medium mb-2">Organization Number</label>
+              <div class="flex items-center gap-2">
+                <input type="text" formControlName="organizationNumber" placeholder="Organization number" class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+                <button type="button" (click)="searchOrganization()" [disabled]="buyerOrgSearchLoading" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition flex items-center gap-2">
+                  <svg *ngIf="buyerOrgSearchLoading" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <i class="ri-search-line" *ngIf="!buyerOrgSearchLoading"></i> Search
+                </button>
+              </div>
+              <div *ngIf="agreementForm.get('organizationNumber')?.invalid && (agreementForm.get('organizationNumber')?.dirty || agreementForm.get('organizationNumber')?.touched)" class="text-red-500 text-sm mt-1">
+                {{ getErrorMessage(agreementForm, 'organizationNumber') }}
+              </div>
+              <div *ngIf="buyerOrgError" class="text-red-500 text-sm mt-1">{{ buyerOrgError }}</div>
+            </div>
+
+            <!-- Hidden Company Fields -->
+            <input type="hidden" formControlName="companyName" />
+            <input type="hidden" formControlName="streetAddress" />
+            <input type="hidden" formControlName="city" />
+            <input type="hidden" formControlName="postalCode" />
+            <input type="hidden" formControlName="contactPerson" />
+            <input type="hidden" formControlName="businessCategory" />
+            <input type="hidden" formControlName="legalForm" />
+            </ng-container>
+
+          <!-- Private Individual Fields -->
+          <ng-container *ngIf="agreementForm.get('customerType')?.value === 'Private Individual'">
+            <div class="flex flex-col">
+              <label class="block font-medium mb-2">Social Security Number</label>
+              <div class="flex items-center gap-2">
+                <input type="text" formControlName="socialSecurityNumber" placeholder="Social Security Number" class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+                <button type="button" (click)="searchOrganization()" [disabled]="personSearchLoading" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition flex items-center gap-2">
+                  <svg *ngIf="personSearchLoading" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <i class="ri-search-line" *ngIf="!personSearchLoading"></i> Search
+                </button>
+              </div>
+              <div *ngIf="agreementForm.get('socialSecurityNumber')?.invalid && (agreementForm.get('socialSecurityNumber')?.dirty || agreementForm.get('socialSecurityNumber')?.touched)" class="text-red-500 text-sm mt-1">
+                {{ getErrorMessage(agreementForm, 'socialSecurityNumber') }}
+              </div>
+          </div>
+
+            <!-- Hidden Private Individual Fields -->
+            <input type="hidden" formControlName="customerName" />
+            <input type="hidden" formControlName="legalId" />
+            <input type="hidden" formControlName="street" />
+            <input type="hidden" formControlName="city" />
+            <input type="hidden" formControlName="zip" />
+          </ng-container>
+
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Email Address</label>
+            <input type="email" formControlName="emailAddress" placeholder="Email address" class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+            <div *ngIf="agreementForm.get('emailAddress')?.invalid && (agreementForm.get('emailAddress')?.dirty || agreementForm.get('emailAddress')?.touched)" class="text-red-500 text-sm mt-1">
+              {{ getErrorMessage(agreementForm, 'emailAddress') }}
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Telephone Number</label>
+            <input type="text" formControlName="telephoneNumber" placeholder="Telephone number" class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+            <div *ngIf="agreementForm.get('telephoneNumber')?.invalid && (agreementForm.get('telephoneNumber')?.dirty || agreementForm.get('telephoneNumber')?.touched)" class="text-red-500 text-sm mt-1">
+              {{ getErrorMessage(agreementForm, 'telephoneNumber') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Trade-in Vehicle Section -->
+        <div class="font-semibold text-lg mb-4 mt-8">Trade-in Vehicle</div>
+        <div class="mb-5">
+          <label class="block font-medium mb-2">Trade-in Vehicle</label>
+          <select formControlName="tradeInVehicle" class="w-full px-4 py-2 border border-gray-200 rounded-lg">
+            <option value="">Select option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+          <div *ngIf="agreementForm.get('tradeInVehicle')?.invalid && (agreementForm.get('tradeInVehicle')?.dirty || agreementForm.get('tradeInVehicle')?.touched)" class="text-red-500 text-sm mt-1">
+            {{ getErrorMessage(agreementForm, 'tradeInVehicle') }}
+          </div>
+        </div>
+
+        <!-- Trade-in Vehicle Details (shown when Yes is selected) -->
+        <div *ngIf="agreementForm.get('tradeInVehicle')?.value === 'Yes'" class="mb-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Registration Number</label>
+            <div class="flex items-center gap-2">
+              <input type="text" formControlName="tradeInRegistrationNumber" placeholder="ABC123" class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+              <button type="button" (click)="searchTradeInVehicle()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition">
+                Fetch
+              </button>
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Purchase Date</label>
+            <input type="date" formControlName="tradeInPurchaseDate" class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Purchase Price (SEK)</label>
+            <input type="text" formControlName="tradeInPurchasePrice" placeholder="0.00" class="w-full px-4 py-2 border border-gray-200 rounded-lg"
+              (input)="formatNumber($event, 'tradeInPurchasePrice')" />
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Mileage (km)</label>
+            <input type="text" formControlName="tradeInMileage" placeholder="0" class="w-full px-4 py-2 border border-gray-200 rounded-lg"
+              (input)="formatNumber($event, 'tradeInMileage')" />
+          </div>
+          
+          <!-- Credit Marking Section -->
+          <div class="col-span-2">
+            <label class="block font-medium mb-2">Credit Marking</label>
+            <select formControlName="tradeInCreditMarking" class="w-full px-4 py-2 border border-gray-200 rounded-lg">
+              <option value="">Select option</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+
+          <!-- Credit Details (shown when Credit Marking is Yes) -->
+          <div *ngIf="agreementForm.get('tradeInCreditMarking')?.value === 'Yes'" class="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex flex-col">
+              <label class="block font-medium mb-2">Creditor</label>
+              <input type="text" formControlName="tradeInCreditor" placeholder="Bank/finance company" class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+            </div>
+            <div class="flex flex-col">
+              <label class="block font-medium mb-2">Credit Amount (SEK)</label>
+              <input type="text" formControlName="tradeInCreditAmount" placeholder="0.00" class="w-full px-4 py-2 border border-gray-200 rounded-lg"
+                (input)="formatNumber($event, 'tradeInCreditAmount')" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Sales Information Section -->
+        <div class="font-semibold text-lg mb-4 mt-8">Sales Information</div>
+        <div class="mb-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Sales Price (SEK)</label>
+            <input type="text" formControlName="salesPrice" placeholder="0.00" class="w-full px-4 py-2 border border-gray-200 rounded-lg"
+              (input)="formatNumber($event, 'salesPrice')" />
+            <div *ngIf="agreementForm.get('salesPrice')?.invalid && (agreementForm.get('salesPrice')?.dirty || agreementForm.get('salesPrice')?.touched)" class="text-red-500 text-sm mt-1">
+              {{ getErrorMessage(agreementForm, 'salesPrice') }}
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Payment Method</label>
+            <select formControlName="paymentMethod" class="w-full px-4 py-2 border border-gray-200 rounded-lg">
+              <option value="">Select payment method</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Swish">Swish</option>
+              <option value="Invoice">Invoice</option>
+              <option value="Financing with Down Payment">Financing with Down Payment</option>
+              <option value="Financing without Down Payment">Financing without Down Payment</option>
+              <option value="Leasing">Leasing</option>
+            </select>
+            <div *ngIf="agreementForm.get('paymentMethod')?.invalid && (agreementForm.get('paymentMethod')?.dirty || agreementForm.get('paymentMethod')?.touched)" class="text-red-500 text-sm mt-1">
+              {{ getErrorMessage(agreementForm, 'paymentMethod') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Financing Fields -->
+        <ng-container *ngIf="showFinancingFields">
+          <div class="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex flex-col">
+              <label class="block font-medium mb-2">Creditor <span class="text-red">*</span></label>
+              <input type="text" formControlName="creditor" placeholder="Bank/finance company" class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+              <div *ngIf="agreementForm.get('creditor')?.invalid && (agreementForm.get('creditor')?.dirty || agreementForm.get('creditor')?.touched)" class="text-red-500 text-sm mt-1">
+                {{ getErrorMessage(agreementForm, 'creditor') }}
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <label class="block font-medium mb-2">Credit Amount (SEK) <span class="text-red">*</span></label>
+              <input type="text" formControlName="creditAmount" placeholder="0.00" class="w-full px-4 py-2 border border-gray-200 rounded-lg"
+                (input)="formatNumber($event, 'creditAmount')" />
+              <div *ngIf="agreementForm.get('creditAmount')?.invalid && (agreementForm.get('creditAmount')?.dirty || agreementForm.get('creditAmount')?.touched)" class="text-red-500 text-sm mt-1">
+                {{ getErrorMessage(agreementForm, 'creditAmount') }}
+              </div>
+            </div>
+            <ng-container *ngIf="showCashBetField">
+              <div class="flex flex-col">
+                <label class="block font-medium mb-2">Cash Bet <span class="text-red">*</span></label>
+                <select formControlName="cashBet" class="w-full px-4 py-2 border border-gray-200 rounded-lg">
+                  <option value="">Select percentage</option>
+                  <option *ngFor="let percentage of cashBetOptions" [value]="percentage">{{percentage}}%</option>
+                </select>
+                <div *ngIf="agreementForm.get('cashBet')?.invalid && (agreementForm.get('cashBet')?.dirty || agreementForm.get('cashBet')?.touched)" class="text-red-500 text-sm mt-1">
+                  {{ getErrorMessage(agreementForm, 'cashBet') }}
+                </div>
+              </div>
+            </ng-container>
+            <div class="flex flex-col">
+              <label class="block font-medium mb-2">Loan Period (months) <span class="text-red">*</span></label>
+              <input type="number" formControlName="loanPeriod" placeholder="months" class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+              <div *ngIf="agreementForm.get('loanPeriod')?.invalid && (agreementForm.get('loanPeriod')?.dirty || agreementForm.get('loanPeriod')?.touched)" class="text-red-500 text-sm mt-1">
+                {{ getErrorMessage(agreementForm, 'loanPeriod') }}
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Leasing Fields -->
+        <ng-container *ngIf="showLeasingFields">
+          <div class="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex flex-col">
+              <label class="block font-medium mb-2">Leasing Provider <span class="text-red">*</span></label>
+              <input type="text" formControlName="leasingProvider" placeholder="Leasing company" class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+              <div *ngIf="agreementForm.get('leasingProvider')?.invalid && (agreementForm.get('leasingProvider')?.dirty || agreementForm.get('leasingProvider')?.touched)" class="text-red-500 text-sm mt-1">
+                {{ getErrorMessage(agreementForm, 'leasingProvider') }}
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <label class="block font-medium mb-2">Leasing Amount (SEK) <span class="text-red">*</span></label>
+              <input type="text" formControlName="leasingAmount" placeholder="0.00" class="w-full px-4 py-2 border border-gray-200 rounded-lg"
+                (input)="formatNumber($event, 'leasingAmount')" />
+              <div *ngIf="agreementForm.get('leasingAmount')?.invalid && (agreementForm.get('leasingAmount')?.dirty || agreementForm.get('leasingAmount')?.touched)" class="text-red-500 text-sm mt-1">
+                {{ getErrorMessage(agreementForm, 'leasingAmount') }}
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <label class="block font-medium mb-2">Leasing Period (months) <span class="text-red">*</span></label>
+              <input type="number" formControlName="leasingPeriod" placeholder="months" class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+              <div *ngIf="agreementForm.get('leasingPeriod')?.invalid && (agreementForm.get('leasingPeriod')?.dirty || agreementForm.get('leasingPeriod')?.touched)" class="text-red-500 text-sm mt-1">
+                {{ getErrorMessage(agreementForm, 'leasingPeriod') }}
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Vehicle Information Section -->
+        <div class="font-semibold text-lg mb-4 mt-8">Vehicle Information</div>
+        <div class="mb-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">VAT Type</label>
+            <select formControlName="vatType" class="w-full px-4 py-2 border border-gray-200 rounded-lg">
+              <option value="">Select VAT type</option>
+              <option value="VBM">VBM</option>
+              <option value="VAT">VAT</option>
+            </select>
+            <div *ngIf="agreementForm.get('vatType')?.invalid && (agreementForm.get('vatType')?.dirty || agreementForm.get('vatType')?.touched)" class="text-red-500 text-sm mt-1">
+              {{ getErrorMessage(agreementForm, 'vatType') }}
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Mileage (km)</label>
+            <input type="text" formControlName="mileage" placeholder="0" class="w-full px-4 py-2 border border-gray-200 rounded-lg"
+              (input)="formatNumber($event, 'mileage')" />
+            <div *ngIf="agreementForm.get('mileage')?.invalid && (agreementForm.get('mileage')?.dirty || agreementForm.get('mileage')?.touched)" class="text-red-500 text-sm mt-1">
+              {{ getErrorMessage(agreementForm, 'mileage') }}
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Keys</label>
+            <select formControlName="numberOfKeys" class="w-full px-4 py-2 border border-gray-200 rounded-lg">
+              <option value="">Select number of keys</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+            <div *ngIf="agreementForm.get('numberOfKeys')?.invalid && (agreementForm.get('numberOfKeys')?.dirty || agreementForm.get('numberOfKeys')?.touched)" class="text-red-500 text-sm mt-1">
+              {{ getErrorMessage(agreementForm, 'numberOfKeys') }}
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Tires</label>
+            <select formControlName="deck" class="w-full px-4 py-2 border border-gray-200 rounded-lg">
+              <option value="">Select tire type</option>
+              <option value="Summer Tires">Summer Tires</option>
+              <option value="Winter Tires">Winter Tires</option>
+              <option value="Summer and Winter Tires">Summer and Winter Tires</option>
+            </select>
+            <div *ngIf="agreementForm.get('deck')?.invalid && (agreementForm.get('deck')?.dirty || agreementForm.get('deck')?.touched)" class="text-red-500 text-sm mt-1">
+              {{ getErrorMessage(agreementForm, 'deck') }}
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Insurer</label>
+            <input type="text" formControlName="insurer" class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+            <div *ngIf="agreementForm.get('insurer')?.invalid && (agreementForm.get('insurer')?.dirty || agreementForm.get('insurer')?.touched)" class="text-red-500 text-sm mt-1">
+              {{ getErrorMessage(agreementForm, 'insurer') }}
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Insurance Type</label>
+            <select formControlName="insuranceType" class="w-full px-4 py-2 border border-gray-200 rounded-lg">
+              <option value="">Select insurance type</option>
+              <option value="Trial">Trial</option>
+              <option value="Traffic Insurance">Traffic Insurance</option>
+              <option value="Half Insurance">Half Insurance</option>
+              <option value="Full Insurance">Full Insurance</option>
+            </select>
+            <div *ngIf="agreementForm.get('insuranceType')?.invalid && (agreementForm.get('insuranceType')?.dirty || agreementForm.get('insuranceType')?.touched)" class="text-red-500 text-sm mt-1">
+              {{ getErrorMessage(agreementForm, 'insuranceType') }}
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Warranty Provider</label>
+            <input type="text" formControlName="warrantyProvider" class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+            <div *ngIf="agreementForm.get('warrantyProvider')?.invalid && (agreementForm.get('warrantyProvider')?.dirty || agreementForm.get('warrantyProvider')?.touched)" class="text-red-500 text-sm mt-1">
+              {{ getErrorMessage(agreementForm, 'warrantyProvider') }}
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Warranty Product</label>
+            <input type="text" formControlName="warrantyProduct" class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+            <div *ngIf="agreementForm.get('warrantyProduct')?.invalid && (agreementForm.get('warrantyProduct')?.dirty || agreementForm.get('warrantyProduct')?.touched)" class="text-red-500 text-sm mt-1">
+              {{ getErrorMessage(agreementForm, 'warrantyProduct') }}
+            </div>
+          </div>
+
+          
+        </div>
+
+        <!-- Payment Information Section -->
+        <div class="font-semibold text-lg mb-4 mt-8">Payment Information</div>
+        <div class="mb-5">
+          <label class="block font-medium mb-2 ">Free Text Message (Payment)</label>
+          <textarea formControlName="freeTextPayment" class="w-full px-4 py-2 border border-gray-200 rounded-lg" rows="3" placeholder="Enter any specific payment details or comments here..."></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-3 mt-8">
+          <!-- In Edit Mode: Show only Update Agreement button -->
+          <ng-container *ngIf="isEditMode">
+            <button 
+              type="submit" 
+              (click)="onSubmit()"
+              [disabled]="isSubmitting"
+              class="px-6 py-2 rounded-lg bg-primary text-white font-semibold hover:bg-primary-dark transition flex items-center gap-2"
+            >
+              <svg *ngIf="isSubmitting" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {{ isSubmitting ? 'Updating Agreement...' : 'Update Agreement' }}
+            </button>
+          </ng-container>
+
+          <!-- In Create Mode: Show both original buttons -->
+          <ng-container *ngIf="!isEditMode">
+            <button 
+              type="submit" 
+              (click)="onSubmit()"
+              [disabled]="isSubmitting || isSubmittingAndSigning"
+              class="px-6 py-2 rounded-lg bg-gray-600 text-white font-semibold hover:bg-gray-700 transition flex items-center gap-2"
+            >
+              <svg *ngIf="isSubmitting" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {{ isSubmitting ? 'Creating Agreement...' : 'Create Agreement' }}
+            </button>
+            <button 
+              type="button" 
+              (click)="onSubmitAndSign()"
+              [disabled]="isSubmitting || isSubmittingAndSigning"
+              class="px-6 py-2 rounded-lg bg-primary text-white font-semibold hover:bg-primary-dark transition flex items-center gap-2"
+            >
+              <svg *ngIf="isSubmittingAndSigning" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <i class="ri-file-text-line" *ngIf="!isSubmittingAndSigning"></i>
+              {{ isSubmittingAndSigning ? 'Creating & Signing...' : 'Create and Sign Agreement' }}
+            </button>
+          </ng-container>
+        </div>
+      </form>
+    </div>
+
+    <!-- Preview Section -->
+    <div class="bg-white rounded-2xl shadow p-8">
+      <div class="font-semibold text-lg mb-2">Preview <span class="text-xs text-gray-400 font-normal">(Updated in real time)</span></div>
+      <div class="border rounded-xl p-6 bg-gray-50 min-w-[320px] max-w-full">
+        <div class="text-center text-xl font-extrabold mb-6 tracking-wide break-words">SALES AGREEMENT</div>
+        <!-- Basic Information -->
+        <div class="bg-white rounded-lg p-4 border mb-4">
+          <div class="font-semibold mb-2">Basic Information</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="text-sm"><span class="text-gray-600">Registration Number:</span> <span class="font-medium text-gray-900">{{ preview.registrationNumber || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Sales Date:</span> <span class="font-medium text-gray-900">{{ preview.salesDate || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Customer Type:</span> <span class="font-medium text-gray-900">{{ preview.customerType || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Email Address:</span> <span class="font-medium text-gray-900">{{ preview.emailAddress || '...' }}</span></div>
+          </div>
+        </div>
+
+        <!-- Customer Details Card -->
+        <div class="bg-white rounded-lg p-4 border mb-4" *ngIf="preview.customerType">
+          <div class="flex items-center justify-between mb-4">
+            <div class="font-semibold">Customer Details</div>
+            <div class="px-2 py-1 rounded text-xs" 
+                [ngClass]="{'bg-blue-100 text-blue-700': preview.customerType === 'Company',
+                           'bg-green-100 text-green-700': preview.customerType === 'Private Individual'}">
+              {{ preview.customerType }}
+            </div>
+          </div>
+          
+          <!-- Company Details -->
+          <div *ngIf="preview.customerType === 'Company'" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="text-sm"><span class="text-gray-600">Organization Number:</span> <span class="font-medium text-gray-900">{{ preview.organizationNumber || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Company Name:</span> <span class="font-medium text-gray-900">{{ preview.companyName || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Street Address:</span> <span class="font-medium text-gray-900">{{ preview.streetAddress || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">City:</span> <span class="font-medium text-gray-900">{{ preview.city || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Postal Code:</span> <span class="font-medium text-gray-900">{{ preview.postalCode || '...' }}</span></div>
+          </div>
+
+          <!-- Private Individual Details -->
+          <div *ngIf="preview.customerType === 'Private Individual'" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="text-sm"><span class="text-gray-600">Customer Name:</span> <span class="font-medium text-gray-900">{{ preview.customerName || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Legal ID:</span> <span class="font-medium text-gray-900">{{ preview.legalId || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Street:</span> <span class="font-medium text-gray-900">{{ preview.street || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Zip:</span> <span class="font-medium text-gray-900">{{ preview.zip || '...' }}</span></div>
+          </div>
+          
+          <!-- Common Details -->
+          <div class="text-sm mt-2"><span class="text-gray-600">Telephone Number:</span> <span class="font-medium text-gray-900">{{ preview.telephoneNumber || '...' }}</span></div>
+        </div>
+
+        <!-- Trade-in Vehicle Preview -->
+        <div class="bg-white rounded-lg p-4 border mb-4" *ngIf="preview.tradeInVehicle">
+          <div class="font-semibold mb-2">Trade-in Vehicle Information</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="text-sm"><span class="text-gray-600">Trade-in Vehicle:</span> <span class="font-medium text-gray-900">{{ preview.tradeInVehicle }}</span></div>
+            
+            <!-- Show details only if Trade-in is Yes -->
+            <ng-container *ngIf="preview.tradeInVehicle === 'Yes'">
+              <div class="text-sm"><span class="text-gray-600">Registration Number:</span> <span class="font-medium text-gray-900">{{ preview.tradeInRegistrationNumber || '...' }}</span></div>
+              <div class="text-sm"><span class="text-gray-600">Purchase Date:</span> <span class="font-medium text-gray-900">{{ preview.tradeInPurchaseDate || '...' }}</span></div>
+              <div class="text-sm"><span class="text-gray-600">Purchase Price:</span> <span class="font-medium text-gray-900">{{ preview.tradeInPurchasePrice ? preview.tradeInPurchasePrice + ' SEK' : '...' }}</span></div>
+              <div class="text-sm"><span class="text-gray-600">Mileage:</span> <span class="font-medium text-gray-900">{{ preview.tradeInMileage ? preview.tradeInMileage + ' km' : '...' }}</span></div>
+              <div class="text-sm"><span class="text-gray-600">Credit Marking:</span> <span class="font-medium text-gray-900">{{ preview.tradeInCreditMarking || '...' }}</span></div>
+              
+              <!-- Show credit details only if Credit Marking is Yes -->
+              <ng-container *ngIf="preview.tradeInCreditMarking === 'Yes'">
+                <div class="text-sm"><span class="text-gray-600">Creditor:</span> <span class="font-medium text-gray-900">{{ preview.tradeInCreditor || '...' }}</span></div>
+                <div class="text-sm"><span class="text-gray-600">Credit Amount:</span> <span class="font-medium text-gray-900">{{ preview.tradeInCreditAmount ? preview.tradeInCreditAmount + ' SEK' : '...' }}</span></div>
+              </ng-container>
+            </ng-container>
+          </div>
+        </div>
+
+        <!-- Sales Information -->
+        <div class="bg-white rounded-lg p-4 border mb-4">
+          <div class="font-semibold mb-2">Sales Information</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="text-sm"><span class="text-gray-600">Sales Price (SEK):</span> <span class="font-medium text-gray-900">{{ preview.salesPrice || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Payment Method:</span> <span class="font-medium text-gray-900">{{ preview.paymentMethod || '...' }}</span></div>
+            
+            <!-- Financing Fields -->
+            <ng-container *ngIf="showFinancingFields">
+              <div class="text-sm"><span class="text-gray-600">Creditor:</span> <span class="font-medium text-gray-900">{{ preview.creditor || '...' }}</span></div>
+              <div class="text-sm"><span class="text-gray-600">Credit Amount (SEK):</span> <span class="font-medium text-gray-900">{{ preview.creditAmount || '...' }}</span></div>
+              <div class="text-sm" *ngIf="showCashBetField"><span class="text-gray-600">Cash Bet:</span> <span class="font-medium text-gray-900">{{ preview.cashBet || '...' }}%</span></div>
+              <div class="text-sm"><span class="text-gray-600">Loan Period (months):</span> <span class="font-medium text-gray-900">{{ preview.loanPeriod || '...' }}</span></div>
+            </ng-container>
+
+            <!-- Leasing Fields -->
+            <ng-container *ngIf="showLeasingFields">
+              <div class="text-sm"><span class="text-gray-600">Leasing Provider:</span> <span class="font-medium text-gray-900">{{ preview.leasingProvider || '...' }}</span></div>
+              <div class="text-sm"><span class="text-gray-600">Leasing Amount (SEK):</span> <span class="font-medium text-gray-900">{{ preview.leasingAmount || '...' }}</span></div>
+              <div class="text-sm"><span class="text-gray-600">Leasing Period (months):</span> <span class="font-medium text-gray-900">{{ preview.leasingPeriod || '...' }}</span></div>
+            </ng-container>
+          </div>
+        </div>
+        <!-- Vehicle Information -->
+        <div class="bg-white rounded-lg p-4 border mb-4">
+          <div class="font-semibold mb-2">Vehicle Information</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="text-sm"><span class="text-gray-600">Registration Number:</span> <span
+                class="font-medium text-gray-900">{{ preview.registrationNumber || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Brand:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.detail?.vehicleBrandRaw || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Model:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.detail?.vehicleModel || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Year:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.detail?.vehicleModelYear || vehicleDetails?.detail?.vehicleYear || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Color:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.detail?.color || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Vehicle Category:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.detail?.vehicleType || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Chassis Number:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.detail?.chassisNumber || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Number of Passengers:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.technicalData?.numberOfPassengers || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Gearbox:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.technicalData?.gearbox || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Fuel Type:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.technicalData?.fuelCodes?.join(', ') || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Total Weight:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.technicalData?.totalWeight ? vehicleDetails.technicalData.totalWeight + ' kg' : '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">VAT Type:</span> <span
+                class="font-medium text-gray-900">{{ preview.vatType || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Mileage (km):</span> <span
+                class="font-medium text-gray-900">{{ preview.mileage || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Keys:</span> <span
+                class="font-medium text-gray-900">{{ preview.numberOfKeys || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Tires:</span> <span
+                class="font-medium text-gray-900">{{ preview.deck || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Insurer:</span> <span
+                class="font-medium text-gray-900">{{ preview.insurer || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Insurance Type:</span> <span
+                class="font-medium text-gray-900">{{ preview.insuranceType || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Warranty Provider:</span> <span
+                class="font-medium text-gray-900">{{ preview.warrantyProvider || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Warranty Product:</span> <span
+                class="font-medium text-gray-900">{{ preview.warrantyProduct || '...' }}</span></div>
+          </div>
+        </div>
+        <!-- Payment Information -->
+        <div class="bg-white rounded-lg p-4 border mb-4">
+          <div class="font-semibold mb-2">Payment Information</div>
+          <div class="text-sm"><span class="text-gray-600 mr-2">Free Text Message (Payment):</span> <span class="font-medium text-gray-900">{{ preview.freeTextPayment || '...' }}</span></div>
+        </div>
+        <!-- Seller Information -->
+        <div class="bg-white rounded-lg p-4 border mb-4">
+          <div class="font-semibold mb-2">Seller Information</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="text-sm"><span class="text-gray-600">Name:</span> <span class="font-medium text-gray-900">{{ preview.seller.name || '' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Organization Name:</span> <span class="font-medium text-gray-900">{{ preview.seller.organizationName || 'N/A' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Organization Number:</span> <span class="font-medium text-gray-900">{{ preview.seller.organizationNumber || 'N/A' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Email:</span> <span class="font-medium text-gray-900">{{ preview.seller.email || 'N/A' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Phone:</span> <span class="font-medium text-gray-900">{{ preview.seller.phone || 'N/A' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Address:</span> <span class="font-medium text-gray-900">{{ preview.seller.address || 'N/A' }}</span></div>
+           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Vehicle Details Modal -->
+<div 
+  *ngIf="showVehicleDetailsModal" 
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+>
+  <div class="bg-white rounded-xl w-full max-w-5xl p-8 max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">Vehicle Details</h2>
+      <button 
+        (click)="closeVehicleDetailsModal()"
+        class="text-gray-500 hover:text-gray-700"
+      >
+        <i class="ri-close-line text-2xl"></i>
+      </button>
+    </div>
+    
+    <!-- Vehicle Details Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Registration Details -->
+      <div class="bg-gray-50 rounded-lg p-4">
+        <h3 class="font-semibold text-lg mb-4">Registration Information</h3>
+        <div class="space-y-2">
+          <div>
+            <span class="text-gray-500">Registration Number:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.registrationData?.registrationNumber || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Registered On:</span>
+            <input 
+              type="text" 
+              [value]="formatDate(vehicleDetails?.registrationData?.registeredOn)" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Country:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.country || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Vehicle Details -->
+      <div class="bg-gray-50 rounded-lg p-4">
+        <h3 class="font-semibold text-lg mb-4">Vehicle Specifications</h3>
+        <div class="space-y-2">
+          <div>
+            <span class="text-gray-500">Brand:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.detail?.vehicleBrandRaw || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Model:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.detail?.vehicleModel || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Model Year:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.detail?.vehicleModelYear || vehicleDetails?.detail?.vehicleYear || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Vehicle Type:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.detail?.vehicleType || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Color:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.detail?.color || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Technical Details -->
+      <div class="bg-gray-50 rounded-lg p-4">
+        <h3 class="font-semibold text-lg mb-4">Technical Information</h3>
+        <div class="space-y-2">
+          <div>
+            <span class="text-gray-500">Chassis Number:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.detail?.chassisNumber || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Model Number:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.detail?.modelNumber || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Gearbox:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.technicalData?.gearbox || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Fuel Type:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.technicalData?.fuelCodes?.join(', ') || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Details -->
+      <div class="bg-gray-50 rounded-lg p-4">
+        <h3 class="font-semibold text-lg mb-4">Status Information</h3>
+        <div class="space-y-2">
+          <div>
+            <span class="text-gray-500">Status Code:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.status?.code || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Registration Type:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.status?.registrationType || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Registration Date:</span>
+            <input 
+              type="text" 
+              [value]="formatDate(vehicleDetails?.detail?.registrationDate)" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Leased:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.status?.leased ? 'Yes' : 'No'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Inspection Details -->
+      <div class="bg-gray-50 rounded-lg p-4">
+        <h3 class="font-semibold text-lg mb-4">Inspection Information</h3>
+        <div class="space-y-2">
+          <div>
+            <span class="text-gray-500">Last Inspection:</span>
+            <input 
+              type="text" 
+              [value]="formatDate(vehicleDetails?.inspection?.inspectionDate)" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Inspection Valid Until:</span>
+            <input 
+              type="text" 
+              [value]="formatDate(vehicleDetails?.inspection?.inspectionDateUpToAndIncluding)" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Mileage:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.inspection?.mileage ? (vehicleDetails.inspection.mileage + ' km') : 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

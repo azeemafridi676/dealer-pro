@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.4;
+            color: #333;
+            background-color: #f9fafb;
+            padding: 10px;
+            font-size: 12px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1f2937;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 12px;
+            color: #6b7280;
+            font-style: italic;
+        }
+        
+        .section {
+            background: #f9fafb;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #d1d5db;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+        
+        .info-grid.single {
+            grid-template-columns: 1fr;
+        }
+        
+        .info-item {
+            margin-bottom: 4px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-right: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            min-width: 120px;
+        }
+        
+        .info-value {
+            font-size: 12px;
+            font-weight: 400;
+            color: #1f2937;
+            word-wrap: break-word;
+            flex: 1;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        .items-table th,
+        .items-table td {
+            border: 1px solid #d1d5db;
+            padding: 6px;
+            text-align: left;
+            font-size: 12px;
+        }
+        
+        .items-table th {
+            background-color: #f3f4f6;
+            font-weight: bold;
+            color: #374151;
+        }
+        
+        .items-table td {
+            background-color: white;
+        }
+        
+        .items-table .text-right {
+            text-align: right;
+        }
+        
+        .totals-section {
+            background: #f3f4f6;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        
+        .totals-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 5px;
+            align-items: center;
+        }
+        
+        .total-label {
+            font-size: 12px;
+            color: #374151;
+        }
+        
+        .total-value {
+            font-size: 12px;
+            font-weight: 500;
+            text-align: right;
+        }
+        
+        .total-final {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1f2937;
+            border-top: 1px solid #d1d5db;
+            padding-top: 5px;
+            margin-top: 5px;
+        }
+        
+        .footer {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+        }
+        
+        .footer-text {
+            font-size: 10px;
+            color: #6b7280;
+        }
+        
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">RECEIPT</div>
+            <div class="subtitle">Receipt Number: {{receiptNumber}}</div>
+        </div>
+        
+        <!-- Receipt Information -->
+        <div class="section">
+            <div class="section-title">Receipt Information</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Receipt Date:</div>
+                    <div class="info-value">{{receiptDate}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Due Date:</div>
+                    <div class="info-value">{{dueDate}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Customer Number:</div>
+                    <div class="info-value">{{customerNumber}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Customer Type:</div>
+                    <div class="info-value">{{customerType}}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Company Information -->
+        <div class="section">
+            <div class="section-title">Company Information</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Organization Number:</div>
+                    <div class="info-value">{{organizationNumber}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Contact Person:</div>
+                    <div class="info-value">{{contactPerson}}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Customer Information -->
+        <div class="section">
+            <div class="section-title">Customer Information</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Email:</div>
+                    <div class="info-value">{{email}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Telephone:</div>
+                    <div class="info-value">{{telephoneNumber}}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Items -->
+        <div class="section">
+            <div class="section-title">Item Details</div>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Product/Service</th>
+                        <th class="text-right">Quantity</th>
+                        <th>Unit</th>
+                        <th class="text-right">Price excl. VAT</th>
+                        <th class="text-right">VAT %</th>
+                        <th class="text-right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each items}}
+                    <tr>
+                        <td>{{product}}</td>
+                        <td class="text-right">{{number}}</td>
+                        <td>{{unit}}</td>
+                        <td class="text-right">{{priceExclVAT}}</td>
+                        <td class="text-right">{{vatRate}}%</td>
+                        <td class="text-right">{{amount}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Totals -->
+        <div class="totals-section">
+            <div class="totals-grid">
+                <div class="total-label">Subtotal (excl. VAT):</div>
+                <div class="total-value">{{subtotal}} SEK</div>
+                
+                <div class="total-label">VAT Amount:</div>
+                <div class="total-value">{{vatAmount}} SEK</div>
+                
+                <div class="total-label total-final">Total Amount:</div>
+                <div class="total-value total-final">{{totalAmount}} SEK</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-text">Generated on: {{generatedDate}}</div>
+            <div class="footer-text">Thank you for your business!</div>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,1009 @@
+<div class="container mx-auto py-6">
+  <!-- Stats Cards Section -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <!-- Total Purchase Agreements Card -->
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-medium text-gray-500">Total purchasing agreements</h3>
+        <div class="p-3 bg-blue/10 w-[3.5rem] h-[3.5rem] flex justify-center items-center rounded-full">
+          <i class="ri-file-list-3-line text-xl text-blue-600"></i>
+        </div>
+      </div>
+      <div *ngIf="loading; else purchaseAgreementsContent" class="flex items-end gap-2">
+        <div class="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+        <div class="h-4 w-12 bg-gray-100 rounded animate-pulse mb-1"></div>
+      </div>
+      <ng-template #purchaseAgreementsContent>
+        <div class="flex items-end gap-2">
+          <span class="text-3xl font-bold">{{ stats.purchaseAgreements || 0 }}</span>
+          <span class="text-sm text-blue-500 mb-1">Purchased vehicles</span>
+        </div>
+      </ng-template>
+    </div>
+    
+    <!-- Total Sales Agreements Card -->
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-medium text-gray-500">Total sales agreements</h3>
+        <div class="p-3 bg-green/10 w-[3.5rem] h-[3.5rem] flex justify-center items-center rounded-full">
+          <i class="ri-money-dollar-circle-line text-xl text-green-600"></i>
+        </div>
+      </div>
+      <div *ngIf="loading; else salesAgreementsContent" class="flex items-end gap-2">
+        <div class="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+        <div class="h-4 w-12 bg-gray-100 rounded animate-pulse mb-1"></div>
+      </div>
+      <ng-template #salesAgreementsContent>
+        <div class="flex items-end gap-2">
+          <span class="text-3xl font-bold">{{ stats.salesAgreements || 0 }}</span>
+          <span class="text-sm text-green-500 mb-1">Vehicles sold</span>
+        </div>
+      </ng-template>
+    </div>
+    
+    <!-- Total Brokerage Agreements Card -->
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-medium text-gray-500">Total brokerage agreements</h3>
+        <div class="p-3 bg-purple/10 w-[3.5rem] h-[3.5rem] flex justify-center items-center rounded-full">
+          <i class="ri-exchange-dollar-line text-xl text-purple-600"></i>
+        </div>
+      </div>
+      <div *ngIf="loading; else brokerageAgreementsContent" class="flex items-end gap-2">
+        <div class="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+        <div class="h-4 w-12 bg-gray-100 rounded animate-pulse mb-1"></div>
+      </div>
+      <ng-template #brokerageAgreementsContent>
+        <div class="flex items-end gap-2">
+          <span class="text-3xl font-bold">{{ stats.brokerageAgreements || 0 }}</span>
+          <span class="text-sm text-purple-500 mb-1">Brokered vehicles</span>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Top Actions Section -->
+  <form [formGroup]="filterForm">
+    <div class="flex flex-wrap gap-[40%] mb-6">
+      <div class="flex-1 w-30">
+        <input type="text" formControlName="searchTerm" (input)="onSearchInput($event)" placeholder="Search for a contract or customer..." class="form-input w-full rounded-xl border border-gray-200 px-4 py-3 h-12" />
+      </div>
+      <div class="flex gap-2 relative">
+        <!-- Filter Button (opens right-side panel) -->
+        <button type="button" class="bg-white border border-gray-200 text-gray-700 px-4 py-2 h-12 rounded-xl flex items-center hover:bg-gray-50 transition shadow-sm" (click)="showAdvancedSearchPanel = true">
+          <i class="ri-filter-3-line mr-2"></i>Filter
+        </button>
+        <!-- New Agreement Button -->
+        <div class="relative">
+          <button type="button" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 h-12 rounded-xl transition-colors flex items-center shadow-sm" (click)="showAgreementDropdown = !showAgreementDropdown">
+            <i class="ri-add-line mr-2"></i>New Agreement
+            <i class="ri-arrow-down-s-line ml-2"></i>
+          </button>
+          <!-- Agreement Type Dropdown Menu -->
+          <div *ngIf="showAgreementDropdown" class="absolute right-0 top-full mt-2 z-50 bg-white rounded-xl shadow-xl border border-gray-100 w-max">
+            <a routerLink="/dashboard/agreements/sales" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors" (click)="showAgreementDropdown = false">
+              <i class="ri-file-list-3-line mr-2"></i>Sales Agreement
+            </a>
+            <a routerLink="/dashboard/agreements/purchase" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors" (click)="showAgreementDropdown = false">
+              <i class="ri-file-list-3-line mr-2"></i>Purchase Agreement
+            </a>
+            <a routerLink="/dashboard/agreements/agency" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors" (click)="showAgreementDropdown = false">
+              <i class="ri-file-list-3-line mr-2"></i>Agency Agreement
+            </a>
+            <a routerLink="/dashboard/invoices/add" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors" (click)="showAgreementDropdown = false">
+              <i class="ri-file-list-3-line mr-2"></i>Receipt
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Right-side Filter Panel with Overlay -->
+  <div *ngIf="showAdvancedSearchPanel">
+    <!-- Overlay -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity" (click)="showAdvancedSearchPanel = false"></div>
+    <!-- Side Panel -->
+    <div class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-50 shadow-xl transition-transform duration-300" @modalAnimation>
+      <div class="flex flex-col h-full">
+        <div class="flex items-center justify-between p-6 border-b">
+          <h2 class="text-xl font-bold">Filter Agreements</h2>
+          <button (click)="showAdvancedSearchPanel = false" class="text-gray-400 hover:text-gray-600 text-2xl">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <form [formGroup]="filterForm" class="flex-1 flex flex-col p-6 gap-4">
+          <!-- Status -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">Status</label>
+            <app-custom-select 
+              formControlName="statusAdv"
+              [options]="statusOptions"
+              placeholder="Select status"
+            ></app-custom-select>
+          </div>
+          <!-- Type of agreement -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">Type of agreement</label>
+            <app-custom-select 
+              formControlName="typeAdv"
+              [options]="agreementTypeOptions"
+              placeholder="Select agreement type"
+            ></app-custom-select>
+          </div>
+          <!-- From Date -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">From date</label>
+            <input type="date" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50" formControlName="fromDate" />
+          </div>
+          <!-- To Date -->
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">To date</label>
+            <input type="date" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50" formControlName="toDate" />
+          </div>
+          <!-- Actions -->
+          <div class="flex justify-between mt-auto">
+            <button type="button" (click)="resetAdvancedFilters()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">Reset</button>
+            <button type="button" (click)="applyAdvancedSearch()" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80 transition">Apply Filter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Vehicle Modal -->
+  <div
+    *ngIf="isVisible"
+    class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
+    @modalAnimation
+  >
+    <div
+      class="bg-white rounded-xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto border border-gray-200 relative shadow-xl"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        (click)="isVisible = false"
+        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl"
+      >
+        <i class="ri-close-line"></i>
+      </button>
+      <h2 class="text-2xl font-bold text-gray-900 mb-1">Add Vehicle</h2>
+      <p class="text-gray-500 mb-6">
+        Enter a registration number or import from Excel file
+      </p>
+      <!-- Tab Switcher -->
+      <div
+        class="flex mb-6 rounded-lg overflow-hidden border border-gray-200 bg-gray-50"
+      >
+        <button
+          type="button"
+          (click)="activeTab = 'reg'"
+          [ngClass]="{
+            'bg-white font-semibold text-primary border-b-2 border-primary':
+              activeTab === 'reg',
+            'text-gray-500': activeTab !== 'reg'
+          }"
+          class="flex-1 px-4 py-2 focus:outline-none transition"
+        >
+          Registration Number
+        </button>
+        <button
+          type="button"
+          (click)="activeTab = 'excel'"
+          [ngClass]="{
+            'bg-white font-semibold text-primary border-b-2 border-primary':
+              activeTab === 'excel',
+            'text-gray-500': activeTab !== 'excel'
+          }"
+          class="flex-1 px-4 py-2 focus:outline-none transition"
+        >
+          Import Excel
+        </button>
+      </div>
+      <!-- Registration Number Tab -->
+      <form
+        *ngIf="activeTab === 'reg'"
+        [formGroup]="vehicleForm"
+        (ngSubmit)="onSubmit()"
+      >
+        <div class="mb-6">
+          <label
+            class="block text-gray-900 text-base font-semibold mb-2"
+            for="regNumber"
+            >Vehicle Registration Number</label
+          >
+          <input
+            type="text"
+            id="regNumber"
+            formControlName="vehicleId"
+            placeholder="Enter registration number"
+            [class.border-red]="
+              vehicleForm.get('vehicleId')?.touched &&
+              vehicleForm.get('vehicleId')?.invalid
+            "
+            class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50"
+          />
+          <div
+            *ngIf="
+              vehicleForm.get('vehicleId')?.touched &&
+              vehicleForm.get('vehicleId')?.invalid
+            "
+            class="text-red text-sm mt-1"
+          >
+            Registration number is required
+          </div>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button
+            type="button"
+            (click)="vehicleForm.reset()"
+            class="px-5 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
+          >
+            Reset
+          </button>
+          <button
+            type="submit"
+            [disabled]="vehicleForm.invalid || addingVehicle"
+            class="px-5 py-2 rounded-md bg-primary text-white font-semibold hover:bg-primary/80 transition flex items-center gap-2"
+          >
+            <svg
+              *ngIf="addingVehicle"
+              class="animate-spin h-4 w-4"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            {{ addingVehicle ? "Adding Vehicle..." : "Add Vehicle" }}
+          </button>
+        </div>
+      </form>
+      <!-- Import Excel Tab -->
+      <div *ngIf="activeTab === 'excel'">
+        <div class="mb-6">
+          <div
+            class="border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center py-10 bg-gray-50 text-center"
+          >
+            <i class="ri-file-list-3-line text-4xl text-gray-400 mb-2"></i>
+            <p class="text-gray-500 mb-4">
+              Drag and drop your Excel file, or click to select
+            </p>
+            <label class="inline-block cursor-pointer">
+              <input
+                #importFile
+                type="file"
+                accept=".xlsx, .xls"
+                style="display: none"
+              />
+              <span
+                class="px-4 py-2 bg-primary text-white rounded-md flex items-center gap-2 hover:bg-primary/80 transition"
+              >
+                <i class="ri-upload-2-line"></i> Select File
+              </span>
+            </label>
+          </div>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button
+            type="button"
+            class="px-5 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
+          >
+            Reset
+          </button>
+          <button
+            type="button"
+            (click)="showComingSoon()"
+            class="px-5 py-2 rounded-md bg-primary text-white font-semibold hover:bg-primary/80 transition"
+          >
+            Import
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agreements Table -->
+  <div class="rounded-xl shadow overflow-hidden border border-primary/10 bg-white">
+    <div class="overflow-x-auto relative">
+      <!-- Loading Error Message -->
+      <div *ngIf="loadingError" class="p-4 text-center text-red bg-red">
+        {{ loadingError }}
+        <button (click)="loadAgreements()" class="ml-2 text-primary hover:underline">Try Again</button>
+      </div>
+      <!-- Skeleton Loading -->
+      <table *ngIf="loading" class="min-w-full rounded-xl overflow-hidden bg-white shadow">
+        <thead>
+          <tr>
+            <th class="w-10 px-6 py-3"></th>
+            <th *ngFor="let col of selectedColumns" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              <div class="h-4 w-24 bg-gray-200 rounded"></div>
+            </th>
+            <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">
+              <div class="h-4 w-10 bg-gray-200 rounded"></div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let i of [1,2,3,4,5]" class="border-b last:border-b-0 animate-pulse">
+            <td class="text-center px-2 py-4">
+              <div class="h-6 w-6 bg-gray-200 rounded"></div>
+            </td>
+            <td *ngFor="let col of selectedColumns" class="px-4 py-4">
+              <div class="h-4 w-32 bg-gray-200 rounded"></div>
+            </td>
+            <td class="px-4 py-4 text-right">
+              <div class="h-6 w-10 bg-gray-200 rounded"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- Actual Content -->
+      <table *ngIf="!loading" class="min-w-full rounded-xl overflow-hidden bg-white shadow">
+        <thead>
+          <tr>
+            <th class="w-10 px-6 py-3"></th>
+            <th *ngFor="let col of selectedColumns" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              {{ col }}
+            </th>
+            <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">
+              <button (click)="showColumnSettings = true" class="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <i class="ri-settings-3-line text-xl"></i>
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="!loading && paginatedAgreements.length === 0">
+            <td [attr.colspan]="selectedColumns.length + 2" class="text-center py-8 text-gray-500">No agreements found.</td>
+          </tr>
+          <ng-container *ngIf="!loading">
+            <ng-container *ngFor="let agreement of paginatedAgreements; let i = index">
+              <tr class="border-b last:border-b-0 hover:bg-gray-50 cursor-pointer select-none text-gray-900" (click)="toggleAccordion(getRowKey(agreement, i))">
+                <td class="text-center px-2">
+                  <button class="flex items-center justify-center text-gray-500 text-2xl" [ngClass]="{'rotate-90 text-primary': expandedRowKey === getRowKey(agreement, i)}" aria-label="Expand details">
+                    <i class="ri-arrow-right-s-line"></i>
+                  </button>
+                </td>
+                <td *ngFor="let col of selectedColumns" class="px-4 py-4 text-gray-900">
+                  <ng-container *ngIf="col === 'Reg. No.'; else defaultCell">
+                    <div class="reg-number">
+                      <span class="reg-number-letter">s</span>
+                      <span class="reg-number-digits">{{ getAgreementCellValue(agreement, col) }}</span>
+                    </div>
+                  </ng-container>
+                  <ng-template #defaultCell>
+                  {{ getAgreementCellValue(agreement, col) }}
+                  </ng-template>
+                </td>
+                <td class="px-4 py-4 text-right">
+                  <button class="text-red-600 hover:text-red-800" title="Delete" (click)="$event.stopPropagation(); openDeleteModal(agreement)">
+                    <i class="ri-delete-bin-line text-2xl"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="expandedRowKey === getRowKey(agreement, i)">
+                <td [attr.colspan]="selectedColumns.length + 2" class="bg-gray-50 px-8 py-8">
+                  <!-- Action Buttons -->
+                  <div class="flex flex-col md:flex-row gap-4 mb-6">
+                    <button class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded border border-gray-200 bg-white text-gray-900 font-medium hover:bg-gray-50 transition" (click)="editAgreement(agreement)">
+                      <i class="ri-edit-2-line"></i> Edit Agreement
+                    </button>
+                    <button class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded border border-gray-200 bg-white text-gray-900 font-medium hover:bg-gray-50 transition" (click)="shareAgreementLink(agreement)">
+                      <i class="ri-share-line"></i> Share Link
+                    </button>
+                    <button class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded border border-gray-200 bg-white text-gray-900 font-medium hover:bg-gray-50 transition" (click)="sendEmail(agreement)">
+                      <i class="ri-mail-line"></i> Send Email
+                    </button>
+                  </div>
+
+                  <!-- Agreement Details -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Sales/Purchase/Agency Information Section -->
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+                      <div class="flex items-center h-16 w-full rounded-t-xl bg-gray-200 justify-center items-center">
+                        <h3 class="font-semibold text-lg">
+                          {{ 
+                            agreement.agreementType === 'Purchase' ? 'Purchase Information' : 
+                            agreement.agreementType === 'Sales' ? 'Sales Information' : 
+                            agreement.agreementType === 'Agency' ? 'Agency Information' : 
+                            'Agreement Information'
+                          }}
+                        </h3>
+                      </div>
+                      <div class="grid grid-cols-2 gap-4 p-6">
+                        <!-- Purchase Agreement Details -->
+                        <ng-container *ngIf="agreement.agreementType === 'Purchase' && agreement.purchase_details">
+                          <ng-container *ngFor="let key of getObjectKeys(agreement.purchase_details)">
+                            <ng-container *ngIf="!isObject(agreement.purchase_details[key])">
+                              <div class="col-span-1">
+                                <div class="text-gray-500">{{ formatKey(key) }}</div>
+                                <div class="font-medium">
+                                  <ng-container [ngSwitch]="key">
+                                    <ng-container *ngSwitchCase="'purchaseDate'">
+                                      {{ agreement.purchase_details[key] | date }}
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'purchasePrice'">
+                                      {{ agreement.purchase_details[key] | currency:'SEK':'symbol':'1.0-0' }}
+                                    </ng-container>
+                                    <ng-container *ngSwitchDefault>
+                                      {{ agreement.purchase_details[key] }}
+                                    </ng-container>
+                                  </ng-container>
+                                </div>
+                              </div>
+                            </ng-container>
+                          </ng-container>
+                        </ng-container>
+                        <ng-container *ngIf="agreement?.purchase_details?.creditMarkingDetails">
+                          <ng-container *ngFor="let key of getObjectKeys(agreement.purchase_details.creditMarkingDetails)">
+                            <div class="col-span-1">
+                              <div class="text-gray-500">{{ formatKey(key) }}</div>
+                              <div class="font-medium">
+                                <ng-container [ngSwitch]="key">
+                                  <ng-container *ngSwitchCase="'creditAmount'">
+                                    {{ agreement.purchase_details.creditMarkingDetails[key] | currency:'SEK':'symbol':'1.0-0' }}
+                                  </ng-container>
+                                  <ng-container *ngSwitchDefault>
+                                    {{ agreement.purchase_details.creditMarkingDetails[key] }}
+                                  </ng-container>
+                                </ng-container>
+                              </div>
+                            </div>
+                          </ng-container>
+                        </ng-container>
+
+                        <!-- Sales Agreement Details -->
+                        <ng-container *ngIf="agreement.agreementType === 'Sales' && agreement.sales_details">
+                          <div *ngIf="agreement.customer_id.customerType === 'Company'" class="col-span-1">
+                            <div class="text-gray-500">Organization Number</div>
+                            <div class="font-medium">{{ agreement?.customer_id?.company_details?.organization_number }}</div>
+                          </div>
+                          <div *ngIf="agreement.customer_id.customerType === 'Private Individual'" class="col-span-1">
+                            <div class="text-gray-500">Social Security Number</div>
+                            <div class="font-medium">{{ agreement?.customer_id?.person_details?.legalId }}</div>
+                          </div>
+                          <ng-container *ngFor="let key of getObjectKeys(getSalesInfoValue(agreement))">
+                            <ng-container *ngIf="!isObject(getSalesInfoValue(agreement)[key])">
+                              <div class="col-span-1">
+                                <div class="text-gray-500">{{ key }}</div>
+                                <div class="font-medium">{{ getSalesInfoValue(agreement)[key] }}</div>
+                              </div>
+                            </ng-container>
+                          </ng-container>
+                        </ng-container>
+
+                        <!-- Agency Agreement Details -->
+                        <ng-container *ngIf="agreement.agreementType === 'Agency' && agreement.agency_details">
+                          <ng-container *ngFor="let key of getObjectKeys(agreement.agency_details)">
+                            <ng-container *ngIf="!isObject(agreement.agency_details[key]) && key !== 'buyer' && key !== 'seller'">
+                              <div class="col-span-1">
+                                <div class="text-gray-500">{{ formatKey(key) }}</div>
+                                <div class="font-medium">
+                                  <ng-container [ngSwitch]="key">
+                                    <ng-container *ngSwitchCase="'agencyDate'">
+                                      {{ agreement.agency_details[key] | date }}
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'salesPrice'">
+                                      {{ agreement.agency_details[key] | currency:'SEK':'symbol':'1.0-0' }}
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'commissionAmount'">
+                                      {{ agreement.agency_details[key] | currency:'SEK':'symbol':'1.0-0' }}
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'agencyFee'">
+                                      {{ agreement.agency_details[key] | currency:'SEK':'symbol':'1.0-0' }}
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'commissionRate'">
+                                      {{ agreement.agency_details[key] }}%
+                                    </ng-container>
+                                    <ng-container *ngSwitchDefault>
+                                      {{ agreement.agency_details[key] }}
+                                    </ng-container>
+                                  </ng-container>
+                                </div>
+                              </div>
+                            </ng-container>
+                          </ng-container>
+
+                          <!-- Buyer Information -->
+                          <div class="col-span-2 mt-4">
+                            <div class="text-gray-700 font-medium mb-2">Buyer Information</div>
+                            <div class="grid grid-cols-2 gap-4">
+                              <div class="col-span-1">
+                                <div class="text-gray-500">Name</div>
+                                <div class="font-medium">{{ agreement.agency_details.buyer?.name || 'N/A' }}</div>
+                              </div>
+                              <div class="col-span-1">
+                                <div class="text-gray-500">Organization</div>
+                                <div class="font-medium">{{ agreement.agency_details.buyer?.organizationName || 'N/A' }}</div>
+                              </div>
+                              <div class="col-span-1">
+                                <div class="text-gray-500">Organization Number</div>
+                                <div class="font-medium">{{ agreement.agency_details.buyer?.organizationNumber || 'N/A' }}</div>
+                              </div>
+                              <div class="col-span-1">
+                                <div class="text-gray-500">Email</div>
+                                <div class="font-medium">{{ agreement.agency_details.buyer?.email || 'N/A' }}</div>
+                              </div>
+                              <div class="col-span-1">
+                                <div class="text-gray-500">Phone</div>
+                                <div class="font-medium">{{ agreement.agency_details.buyer?.phone || 'N/A' }}</div>
+                              </div>
+                              <div class="col-span-2">
+                                <div class="text-gray-500">Address</div>
+                                <div class="font-medium">{{ agreement.agency_details.buyer?.address || 'N/A' }}</div>
+                              </div>
+                              <div class="col-span-1">
+                                <div class="text-gray-500">Business Category</div>
+                                <div class="font-medium">{{ agreement.agency_details.buyer?.businessCategory || 'N/A' }}</div>
+                              </div>
+                              <div class="col-span-1">
+                                <div class="text-gray-500">Legal Form</div>
+                                <div class="font-medium">{{ agreement.agency_details.buyer?.legalForm || 'N/A' }}</div>
+                              </div>
+                            </div>
+                          </div>
+                        </ng-container>
+                      </div>
+                    </div>
+
+                    <!-- Customer Details -->
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+                      <div class="flex items-center h-16 w-full rounded-t-xl bg-gray-200 justify-center items-center">
+                        <h3 class="font-semibold text-lg">
+                          {{ getSafeValue(agreement, 'customer_id.customerType') === 'Company' ? 'Company Information' : 'Customer Information' }}
+                        </h3>
+                      </div>
+                      <div class="grid grid-cols-2 gap-4 p-6">
+                        <!-- Basic Customer Information -->
+                        <div class="col-span-2 mb-4">
+                          <div class="text-sm font-medium text-gray-500 mb-2">Basic Information</div>
+                      <div class="grid grid-cols-2 gap-4">
+                            <div class="col-span-1">
+                              <div class="text-gray-500">Name</div>
+                              <div class="font-medium">{{ getSafeValue(agreement, 'customer_id.name') }}</div>
+                            </div>
+                            <div class="col-span-1">
+                              <div class="text-gray-500">Customer Type</div>
+                              <div class="font-medium">{{ getSafeValue(agreement, 'customer_id.customerType') }}</div>
+                            </div>
+                            <div class="col-span-1">
+                              <div class="text-gray-500">Email</div>
+                              <div class="font-medium">{{ getSafeValue(agreement, 'customer_id.email') }}</div>
+                            </div>
+                            <div class="col-span-1">
+                              <div class="text-gray-500">Telephone</div>
+                              <div class="font-medium">{{ getSafeValue(agreement, 'customer_id.telephone') }}</div>
+                            </div>
+                            <div class="col-span-2">
+                              <div class="text-gray-500">Address</div>
+                              <div class="font-medium">{{ getSafeValue(agreement, 'customer_id.address') }}</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Company Specific Information -->
+                        <ng-container *ngIf="getSafeValue(agreement, 'customer_id.customerType') === 'Company'">
+                          <div class="col-span-2">
+                            <div class="text-sm font-medium text-gray-500 mb-2">Company Details</div>
+                            <div class="grid grid-cols-2 gap-4">
+                              
+                              <div class="col-span-1">
+                                <div class="text-gray-500">Company Name</div>
+                                <div class="font-medium">{{ getSafeValue(agreement, 'customer_id.company_details.corp_name') }}</div>
+                              </div>
+                              <div class="col-span-1">
+                                <div class="text-gray-500">Postal Code</div>
+                                <div class="font-medium">{{ getSafeValue(agreement, 'customer_id.company_details.postal_code') }}</div>
+                              </div>
+                              <div class="col-span-1">
+                                <div class="text-gray-500">City</div>
+                                <div class="font-medium">{{ getSafeValue(agreement, 'customer_id.company_details.city') }}</div>
+                              </div>
+                              <div class="col-span-2">
+                                <div class="text-gray-500">Street Address</div>
+                                <div class="font-medium">{{ getSafeValue(agreement, 'customer_id.company_details.street_address') }}</div>
+                              </div>
+                              <div class="col-span-1">
+                                <div class="text-gray-500">Business Category</div>
+                                <div class="font-medium">{{ getSafeValue(agreement, 'customer_id.company_details.business_category') }}</div>
+                              </div>
+                              <div class="col-span-1">
+                                <div class="text-gray-500">Legal Form</div>
+                                <div class="font-medium">{{ getSafeValue(agreement, 'customer_id.company_details.legal_form') }}</div>
+                              </div>
+                              <div class="col-span-1">
+                                <div class="text-gray-500">Contact Person</div>
+                                <div class="font-medium">{{ getSafeValue(agreement, 'customer_id.company_details.contact_person') }}</div>
+                              </div>
+                            </div>
+                            </div>
+                          </ng-container>
+
+                        <!-- Individual Specific Information -->
+                        <ng-container *ngIf="getSafeValue(agreement, 'customer_id.customerType') === 'Private Individual'">
+                          <div class="col-span-2">
+                            <div class="text-sm font-medium text-gray-500 mb-2">Personal Details</div>
+                            <div class="grid grid-cols-2 gap-4">
+                              <div class="col-span-1">
+                                <div class="text-gray-500">Birth Date</div>
+                                <div class="font-medium">{{ getFormattedDate(getSafeValue(agreement, 'customer_id.person_details.birthDate')) }}</div>
+                              </div>
+                              <div class="col-span-1">
+                                <div class="text-gray-500">Gender</div>
+                                <div class="font-medium">{{ getSafeValue(agreement, 'customer_id.person_details.gender') }}</div>
+                              </div>
+                            </div>
+                          </div>
+                        </ng-container>
+                      </div>
+                    </div>
+
+                    <!-- Vehicle Information -->
+                    <div class="col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm">
+                      <div class="flex items-center h-16 w-full rounded-t-xl bg-gray-200 justify-center items-center">
+                        <h3 class="font-semibold text-lg">Vehicle Information</h3>
+                      </div>
+                      <div class="grid grid-cols-3 gap-4 p-6">
+                        <ng-container *ngFor="let key of getObjectKeys(getVehicleInfoValue(agreement))">
+                          <ng-container *ngIf="!isObject(getVehicleInfoValue(agreement)[key]); else nestedObject">
+                            <div class="col-span-1">
+                              <div class="text-gray-500">{{ key }}</div>
+                              <div class="font-medium">
+                                <ng-container *ngIf="key === 'Registration Number'; else defaultVehicleValue">
+                                  <div class="reg-number">
+                                    <span class="reg-number-letter">s</span>
+                                    <span class="reg-number-digits">{{ getVehicleInfoValue(agreement)[key] }}</span>
+                                  </div>
+                                </ng-container>
+                                <ng-template #defaultVehicleValue>
+                                  {{ getVehicleInfoValue(agreement)[key] }}
+                                </ng-template>
+                              </div>
+                            </div>
+                          </ng-container>
+                          <ng-template #nestedObject>
+                            <div class="col-span-3" *ngIf="isObject(getVehicleInfoValue(agreement)[key])">
+                              <div class="text-gray-700 font-medium mb-2">{{ key }}</div>
+                              <div class="grid grid-cols-3 gap-4">
+                                <ng-container *ngFor="let nestedKey of getObjectKeys(getVehicleInfoValue(agreement)[key])">
+                                  <div class="col-span-1">
+                                    <div class="text-gray-500">{{ nestedKey }}</div>
+                                    <div class="font-medium">
+                                      {{ getVehicleInfoValue(agreement)[key][nestedKey] }}
+                                    </div>
+                                  </div>
+                                </ng-container>
+                              </div>
+                            </div>
+                          </ng-template>
+                        </ng-container>
+                      </div>
+                    </div>
+
+                    <!-- Trade-in Vehicle Details -->
+                    <div class="col-span-2" *ngIf="agreement.sales_details?.tradeInVehicle">
+                      <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <div class="flex items-center h-16 w-full rounded-t-xl bg-gray-200 justify-between px-6">
+                          <h3 class="font-semibold text-lg">Trade-in Vehicle Information</h3>
+                          <button class="text-gray-500 text-2xl transition-transform duration-200" 
+                                  [ngClass]="{'rotate-180': expandedTradeInVehicle === agreement['_id']}"
+                                  (click)="toggleTradeInVehicle(agreement['_id'])">
+                            <i class="ri-arrow-down-s-line"></i>
+                          </button>
+                        </div>
+                        <!-- Rest of trade-in vehicle content -->
+                        <div class="p-6">
+                          <!-- Basic Trade-in Info Always Visible -->
+                          <div class="grid grid-cols-2 gap-4">
+                            <div class="col-span-1">
+                              <div class="text-gray-500">Registration Number</div>
+                              <div class="reg-number">
+                                <span class="reg-number-letter">s</span>
+                                <span class="reg-number-digits">{{ agreement.sales_details.tradeInVehicle.registrationNumber }}</span>
+                              </div>
+                            </div>
+                            <div class="col-span-1">
+                              <div class="text-gray-500">Purchase Price</div>
+                              <div class="font-medium">{{ agreement.sales_details.tradeInVehicle.purchasePrice }}</div>
+                            </div>
+                            <div class="col-span-1">
+                              <div class="text-gray-500">Purchase Date</div>
+                              <div class="font-medium">{{ agreement.sales_details.tradeInVehicle.purchaseDate | date }}</div>
+                            </div>
+                            <div class="col-span-1">
+                              <div class="text-gray-500">Mileage</div>
+                              <div class="font-medium">{{ agreement.sales_details.tradeInVehicle.mileage }}</div>
+                            </div>
+                          </div>
+
+                          <!-- Detailed Trade-in Info in Collapsible Section -->
+                          <div class="mt-4 overflow-hidden transition-all duration-200" 
+                               [ngClass]="{'max-h-0': expandedTradeInVehicle !== agreement['_id'], 'max-h-[1000px]': expandedTradeInVehicle === agreement['_id']}">
+                            <div class="pt-4 border-t">
+                              <div class="grid grid-cols-2 gap-4">
+                                <ng-container *ngFor="let key of getObjectKeys(getTradeInVehicleDetails(agreement.sales_details.tradeInVehicle))">
+                                  <ng-container *ngIf="!['Registration Number', 'Purchase Price', 'Purchase Date', 'Mileage'].includes(key)">
+                                <div class="col-span-1">
+                                      <div class="text-gray-500">{{ key }}</div>
+                                      <div class="font-medium">
+                                        <ng-container *ngIf="key === 'Registration Number'; else defaultTradeInValue">
+                                          <div class="reg-number">
+                                            <span class="reg-number-letter">s</span>
+                                            <span class="reg-number-digits">{{ getTradeInVehicleDetails(agreement.sales_details.tradeInVehicle)[key] }}</span>
+                                          </div>
+                                        </ng-container>
+                                        <ng-template #defaultTradeInValue>
+                                          {{ getTradeInVehicleDetails(agreement.sales_details.tradeInVehicle)[key] }}
+                                        </ng-template>
+                                      </div>
+                                </div>
+                              </ng-container>
+                            </ng-container>
+                          </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Documents Section -->
+                    <div class="col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm">
+                      <div class="flex items-center h-16 w-full rounded-t-xl bg-gray-200 justify-between px-6">
+                        <h3 class="font-semibold text-lg">Documents</h3>
+                        <button class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition"
+                                (click)="triggerDocumentUpload(agreement)"
+                                [disabled]="uploadingDocument">
+                          <i class="ri-upload-2-line"></i>
+                          {{ uploadingDocument ? 'Uploading...' : 'Upload' }}
+                        </button>
+                      </div>
+                      <div class="p-6">
+                      <div class="bg-gray-50 rounded-lg p-4">
+                        <ng-container *ngIf="agreement.documents?.length; else noDocuments">
+                          <div *ngFor="let doc of agreement.documents" class="flex items-center justify-between py-2 border-b last:border-b-0">
+                            <div class="flex items-center gap-3">
+                              <i class="ri-file-text-line text-2xl text-primary"></i>
+                              <div>
+                                <div class="font-medium">{{ doc.name }}</div>
+                                <div class="text-sm text-gray-500">{{ doc.uploadedAt | date }}</div>
+                              </div>
+                            </div>
+                            <div class="flex gap-2">
+                              <button class="text-primary hover:text-primary-dark" (click)="viewDocument(agreement, doc)">
+                                <i class="ri-eye-line"></i>
+                              </button>
+                              <button class="text-primary hover:text-primary-dark" (click)="downloadDocument(agreement, doc)">
+                                <i class="ri-download-line"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </ng-container>
+                        <ng-template #noDocuments>
+                          <div class="text-center text-gray-500 py-4">No documents available</div>
+                        </ng-template>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div *ngIf="totalItems > 0" class="mt-6 flex justify-between items-center">
+    <div class="text-sm text-gray-500">
+      Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ currentPage * itemsPerPage > totalItems ? totalItems : currentPage * itemsPerPage }} of {{ totalItems }} items
+    </div>
+    <nav aria-label="Pagination" class="flex space-x-1">
+      <button 
+        [disabled]="currentPage === 1"
+        (click)="changePage(currentPage - 1)" 
+        class="p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Previous page"
+      >
+        <i class="ri-arrow-left-s-line"></i>
+      </button>
+      <ng-container *ngFor="let page of getDisplayedPageNumbers()">
+        <button 
+          (click)="changePage(page)"
+          [ngClass]="{
+            'bg-primary text-white hover:bg-primary/90': page === currentPage,
+            'bg-white text-gray-500 hover:bg-gray-50': page !== currentPage
+          }"
+          class="h-9 w-9 flex items-center justify-center rounded-full border border-gray-200"
+        >
+          {{ page }}
+        </button>
+      </ng-container>
+      <button 
+        [disabled]="currentPage === totalPages || totalPages === 0"
+        (click)="changePage(currentPage + 1)" 
+        class="p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Next page"
+      >
+        <i class="ri-arrow-right-s-line"></i>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div
+    *ngIf="showDeleteModal"
+    class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
+  >
+    <div
+      class="bg-white rounded-xl w-full max-w-md p-8 border border-gray-200 relative shadow-xl flex flex-col items-center"
+    >
+      <button
+        (click)="closeDeleteModal()"
+        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl"
+      >
+        <i class="ri-close-line"></i>
+      </button>
+      <i class="ri-delete-bin-line text-primary text-4xl mb-4"></i>
+      <h2 class="text-xl font-bold text-gray-900 mb-2">Delete Agreement</h2>
+      <p class="text-gray-600 mb-6 text-center">
+        Are you sure you want to delete this agreement?<br>
+        <span class="font-semibold text-red">This will also delete all related customers.</span><br>
+        This action cannot be undone.
+      </p>
+      <div class="flex gap-4 w-full justify-center">
+        <button
+          type="button"
+          (click)="closeDeleteModal()"
+          class="px-5 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
+          [disabled]="deleteLoading"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          (click)="deleteVehicle()"
+          [disabled]="deleteLoading"
+          class="px-5 py-2 bg-primary text-white rounded-md transition flex items-center gap-2"
+        >
+          <svg
+            *ngIf="deleteLoading"
+            class="animate-spin h-4 w-4"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          {{ deleteLoading ? "Deleting..." : "Delete" }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Column Settings Modal -->
+  <div
+    *ngIf="showColumnSettings"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  >
+    <div
+      class="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] flex flex-col"
+    >
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-6 border-b">
+        <h2 class="text-xl font-semibold">Column Settings</h2>
+        <button
+          (click)="showColumnSettings = false"
+          class="text-gray-500 hover:text-gray-700"
+        >
+          <i class="ri-close-line text-2xl"></i>
+        </button>
+      </div>
+
+      <!-- Modal Content -->
+      <div class="p-6 overflow-y-auto flex-1">
+        <div class="flex gap-8">
+          <!-- Available Columns -->
+          <div class="flex-1 flex flex-col min-h-0">
+            <h3 class="text-lg font-semibold mb-4">Available Columns</h3>
+            <div class="text-sm text-gray-500 mb-2">
+              Total: {{ availableColumns.length }}
+            </div>
+            <div class="overflow-y-auto flex-1 max-h-[250px]">
+              @for (col of availableColumns; track col) {
+              <div
+                class="flex items-center justify-between p-3 border-b last:border-b-0 hover:bg-gray-50"
+              >
+                <span class="text-gray-900">{{ col }}</span>
+                <button
+                  (click)="addColumn(col)"
+                  class="text-primary hover:text-primary-dark"
+                >
+                  <i class="ri-add-line text-xl"></i>
+                </button>
+              </div>
+              }
+            </div>
+          </div>
+
+          <!-- Selected Columns -->
+          <div class="flex-1 flex flex-col min-h-0">
+            <h3 class="text-lg font-semibold mb-4">Selected Columns</h3>
+            <div class="text-sm text-gray-500 mb-2">
+              Total: {{ selectedColumns.length }}
+            </div>
+            <div
+              class="overflow-y-auto flex-1 max-h-[250px]"
+              cdkDropList
+              #selectedList="cdkDropList"
+              [cdkDropListData]="selectedColumns"
+              (cdkDropListDropped)="onColumnDrop($event)"
+            >
+              @for (col of selectedColumns; track col) {
+              <div
+                class="flex items-center justify-between p-3 border-b last:border-b-0 hover:bg-gray-50"
+                cdkDrag
+              >
+                <div class="flex items-center gap-2">
+                  <i class="ri-drag-move-line text-gray-400"></i>
+                  <span class="text-gray-900">{{ col }}</span>
+                </div>
+                <button
+                  (click)="removeColumn($index)"
+                  class="text-gray-500 hover:text-gray-700"
+                >
+                  <i class="ri-close-line text-xl"></i>
+                </button>
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex justify-end gap-4 p-6 border-t">
+        <button
+          (click)="showColumnSettings = false"
+          class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition"
+        >
+          Cancel
+        </button>
+        <button
+          (click)="saveColumnSettings()"
+          class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
+        >
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+

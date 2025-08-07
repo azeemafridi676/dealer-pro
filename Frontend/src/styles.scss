@@ -1,0 +1,405 @@
+@use '@angular/material' as mat;
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import 'remixicon/fonts/remixicon.css';
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+// Include theme styles
+@include mat.core();
+
+// Define palettes with completely different colors
+$indigo-palette: mat.define-palette(mat.$indigo-palette, 700);
+$green-palette: mat.define-palette(mat.$green-palette, 700);
+$deep-purple-palette: mat.define-palette(mat.$deep-purple-palette, 700);
+$amber-palette: mat.define-palette(mat.$amber-palette, 700);
+$red-palette: mat.define-palette(mat.$red-palette, 700);
+
+// Define 5 different themes with completely different colors
+$indigo-theme: mat.define-light-theme((
+  color: (
+    primary: $indigo-palette,
+    accent: mat.define-palette(mat.$pink-palette, A200),
+    warn: mat.define-palette(mat.$red-palette),
+  )
+));
+
+$green-theme: mat.define-light-theme((
+  color: (
+    primary: $green-palette,
+    accent: mat.define-palette(mat.$orange-palette, A200),
+    warn: mat.define-palette(mat.$red-palette),
+  )
+));
+
+$deep-purple-theme: mat.define-light-theme((
+  color: (
+    primary: $deep-purple-palette,
+    accent: mat.define-palette(mat.$cyan-palette, A200),
+    warn: mat.define-palette(mat.$red-palette),
+  )
+));
+
+$amber-theme: mat.define-light-theme((
+  color: (
+    primary: $amber-palette,
+    accent: mat.define-palette(mat.$blue-palette, A200),
+    warn: mat.define-palette(mat.$red-palette),
+  )
+));
+
+$red-theme: mat.define-light-theme((
+  color: (
+    primary: $red-palette,
+    accent: mat.define-palette(mat.$teal-palette, A200),
+    warn: mat.define-palette(mat.$red-palette),
+  )
+));
+
+// Apply the default theme (indigo) by default
+@include mat.all-component-themes($indigo-theme);
+
+// Theme classes with CSS variables
+:root {
+  --primary-color: black;
+  --primary-dark: #{mat.get-color-from-palette($indigo-palette, darker)};
+  --primary-light: #{mat.get-color-from-palette($indigo-palette, lighter)};
+  --bg-color: #f8f9ff;
+  --main-text-color: #6B6B6B;
+  --main-text-color-light: #6b6b6b97;
+  --bg-secondary: #f0f2ff;
+  transition: all 0.3s ease;
+}
+
+// Dynamic color styles
+.mat-primary {
+  color: var(--primary-color) !important;
+}
+
+.mat-primary-bg {
+  background-color: var(--primary-color) !important;
+}
+
+.mat-primary-light {
+  color: var(--primary-light) !important;
+}
+
+.mat-primary-light-bg {
+  background-color: var(--primary-light) !important;
+}
+
+.mat-primary-dark {
+  color: var(--primary-dark) !important;
+}
+
+.mat-primary-dark-bg {
+  background-color: var(--primary-dark) !important;
+}
+
+// Material theme overrides
+.mat-mdc-button.mat-primary {
+  --mdc-filled-button-container-color: var(--primary-color);
+  --mdc-filled-button-label-text-color: white;
+}
+
+.mat-mdc-raised-button.mat-primary {
+  --mdc-protected-button-container-color: var(--primary-color);
+  --mdc-protected-button-label-text-color: white;
+}
+
+.mat-mdc-outlined-button.mat-primary {
+  --mdc-outlined-button-outline-color: var(--primary-color);
+  --mdc-outlined-button-label-text-color: var(--primary-color);
+}
+
+.mat-mdc-form-field.mat-primary {
+  --mdc-outlined-text-field-outline-color: var(--primary-color);
+  --mdc-outlined-text-field-focus-outline-color: var(--primary-color);
+  --mdc-outlined-text-field-hover-outline-color: var(--primary-color);
+}
+
+// Theme classes with CSS variables
+.theme-indigo {
+  @include mat.all-component-themes($indigo-theme);
+  --primary-color: #{mat.get-color-from-palette($indigo-palette)};
+  --primary-dark: #{mat.get-color-from-palette($indigo-palette, darker)};
+  --primary-light: #{mat.get-color-from-palette($indigo-palette, lighter)};
+  --bg-color: #f8f9ff;
+  --bg-secondary: #f0f2ff;
+  transition: all 0.3s ease;
+}
+
+.theme-green {
+  @include mat.all-component-themes($green-theme);
+  --primary-color: #{mat.get-color-from-palette($green-palette)};
+  --primary-dark: #{mat.get-color-from-palette($green-palette, darker)};
+  --primary-light: #{mat.get-color-from-palette($green-palette, lighter)};
+  --bg-color: #f5fff8;
+  --bg-secondary: #e8fff0;
+  transition: all 0.3s ease;
+}
+
+.theme-deep-purple {
+  @include mat.all-component-themes($deep-purple-theme);
+  --primary-color: #{mat.get-color-from-palette($deep-purple-palette)};
+  --primary-dark: #{mat.get-color-from-palette($deep-purple-palette, darker)};
+  --primary-light: #{mat.get-color-from-palette($deep-purple-palette, lighter)};
+  --bg-color: #faf5ff;
+  --bg-secondary: #f3e8ff;
+  transition: all 0.3s ease;
+}
+
+.theme-amber {
+  @include mat.all-component-themes($amber-theme);
+  --primary-color: #{mat.get-color-from-palette($amber-palette)};
+  --primary-dark: #{mat.get-color-from-palette($amber-palette, darker)};
+  --primary-light: #{mat.get-color-from-palette($amber-palette, lighter)};
+  --bg-color: #fffbf5;
+  --bg-secondary: #fff3e8;
+  transition: all 0.3s ease;
+}
+
+.theme-red {
+  @include mat.all-component-themes($red-theme);
+  --primary-color: #{mat.get-color-from-palette($red-palette)};
+  --primary-dark: #{mat.get-color-from-palette($red-palette, darker)};
+  --primary-light: #{mat.get-color-from-palette($red-palette, lighter)};
+  --bg-color: #fff5f5;
+  --bg-secondary: #ffe8e8;
+  transition: all 0.3s ease;
+}
+
+// Utility classes for theme colors
+.text-primary {
+  color: var(--primary-color-for-dynamic-theme) !important;
+}
+
+.text-main {
+  color: var(--main-text-color);
+}
+
+.text-main-light {
+  color: var(--main-text-color-light);
+}
+
+.bg-primary {
+  background-color: var(--primary-color-for-dynamic-theme) !important;
+}
+
+.bg-primary-dark {
+  background-color: var(--primary-dark) !important;
+}
+
+.bg-primary-light {
+  background-color: var(--primary-light) !important;
+}
+
+.bg-theme {
+  background-color: var(--bg-color);
+}
+
+.bg-theme-secondary {
+  background-color: var(--bg-secondary);
+}
+
+thead {
+  background-color: var(--primary-color-for-dynamic-theme);
+  color: white !important;
+}
+
+.focus\:ring-primary\/20:focus {
+  --tw-ring-color: var(--primary-color);
+  opacity: 0.2;
+}
+
+.focus\:border-primary:focus {
+  border-color: var(--primary-color);
+}
+
+// Add some custom styles for the theme toggle
+.theme-toggle {
+  margin: 8px;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+.gradient-bg {
+    background: linear-gradient(90deg, #4338ca, #6366f1);
+}
+/* Updated menu hover effect without underline */
+.nav-link {
+    position: relative;
+    overflow: hidden;
+    padding: 0.5rem 0.75rem;
+    margin: 0 0.25rem;
+    z-index: 1;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+.nav-link:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(99, 102, 241, 0.1);
+    transition: all 0.3s ease;
+    z-index: -1;
+    border-radius: 4px;
+}
+.nav-link:hover:before, .nav-link.active:before {
+    left: 0;
+}
+/* Active state styling */
+.nav-link.active {
+    color: #4338ca;
+    font-weight: 500;
+}
+.login-btn {
+    background: linear-gradient(90deg, #4338ca, #6366f1);
+    transition: all 0.3s ease;
+}
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+}
+/* Social icon styles */
+.social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background-color: white;
+    border-radius: 50%;
+    color: #4338ca;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.social-icon:hover {
+    transform: translateY(-3px) rotate(8deg);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    color: #6366f1;
+}
+
+/* Hero section styles */
+.hero-shape {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background-color: rgba(99, 102, 241, 0.05);
+    clip-path: polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%);
+    z-index: -1;
+}
+
+.hero-btn-primary {
+    background: linear-gradient(90deg, #4338ca, #6366f1);
+    transition: all 0.3s ease;
+}
+
+.hero-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+}
+
+.hero-btn-secondary {
+    transition: all 0.3s ease;
+}
+
+.hero-btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.floating {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.hero-badge {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.6s;
+}
+
+.hero-badge:hover::before {
+    left: 100%;
+}
+
+.gradient-text {
+    background: linear-gradient(90deg, #4338ca, #6366f1);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+// Theme circle styles
+.theme-circle {
+  @apply flex flex-col items-center cursor-pointer transition-all duration-200;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+  
+  &.selected {
+    .w-12 {
+      @apply ring-4 ring-offset-2;
+      ring-color: var(--primary-color);
+    }
+  }
+  
+  .w-12 {
+    @apply transition-all duration-200;
+  }
+}
+
+// Add transition to all theme-related properties
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+input:focus {
+  color: #6b6b6b !important;
+  font-weight: 500 !important;
+  opacity: 1 !important;
+}
+
+textarea:focus {
+  color: #6b6b6b !important;
+  font-weight: 500 !important;
+  opacity: 1 !important;
+}
+
+select:focus {
+  color: #6b6b6b !important;
+  font-weight: 500 !important;
+  opacity: 1 !important;
+}
+

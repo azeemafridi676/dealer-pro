@@ -1,0 +1,33 @@
+.corp-users-container {
+  padding: 24px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 500;
+    }
+  }
+
+  .search-bar {
+    margin-bottom: 16px;
+    
+    input {
+      width: 300px;
+    }
+  }
+
+  .modal-footer {
+    margin-top: 24px;
+    text-align: right;
+
+    button + button {
+      margin-left: 8px;
+    }
+  }
+} 

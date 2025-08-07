@@ -1,0 +1,616 @@
+<div class="min-h-screen py-8 px-0">
+  <!-- Header -->
+  <div class=" mx-auto mb-6 flex items-center justify-between">
+    <button class="flex items-center gap-2 text-gray-500 hover:text-primary font-medium text-base bg-transparent border-none p-0" (click)="goBack()">
+      <i class="ri-arrow-left-line text-xl"></i> Back
+    </button>
+  </div>
+
+  <div class=" mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+    <!-- Left: Combined Form -->
+    <div class="bg-white rounded-2xl shadow p-8">
+      <h2 class="text-2xl font-bold mb-6">{{ isEditMode ? 'Edit' : 'Create' }} Agency Agreement</h2>
+      
+      <form [formGroup]="agencyForm" autocomplete="off">
+        <!-- Basic Information Section -->
+        <div class="font-semibold text-lg mb-4 mt-2">Basic Information</div>
+        <div class="mb-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Registration Number <span class="text-red">*</span></label>
+            <div class="flex items-center gap-2">
+              <input type="text" formControlName="registrationNumber" placeholder="Enter registration number"
+                class="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-gray-50" />
+              <button type="button" (click)="searchVehicle()" [disabled]="vehicleSearching"
+                class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition flex items-center gap-2">
+                <svg *ngIf="vehicleSearching" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg"
+                  fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                  </path>
+                </svg>
+                Search
+              </button>
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Agency Date <span class="text-red">*</span></label>
+            <input type="date" formControlName="agencyDate"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Customer Type <span class="text-red">*</span></label>
+            <select formControlName="customerType" class="w-full px-4 py-2 border border-gray-200 rounded-lg">
+              <option value="">Select</option>
+              <option value="Company">Company</option>
+              <option value="Private Individual">Private Individual</option>
+            </select>
+          </div>
+
+          <!-- Company Fields -->
+          <ng-container *ngIf="agencyForm.get('customerType')?.value === 'Company'">
+            <div class="flex flex-col">
+              <label class="block font-medium mb-2">Organization Number <span class="text-red">*</span></label>
+              <div class="flex items-center gap-2">
+                <input type="text" formControlName="organizationNumber" placeholder="Organization number"
+                  class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+                <button type="button" (click)="publicSearchOrganization()" [disabled]="orgSearchLoading"
+                  class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition flex items-center gap-2">
+                  <svg *ngIf="orgSearchLoading" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg"
+                    fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <i class="ri-search-line" *ngIf="!orgSearchLoading"></i> Search
+                </button>
+              </div>
+              <div *ngIf="orgError" class="text-red-500 text-sm mt-1">{{ orgError }}</div>
+            </div>
+
+            <!-- Hidden Company Fields -->
+            <input type="hidden" formControlName="companyName" />
+            <input type="hidden" formControlName="streetAddress" />
+            <input type="hidden" formControlName="city" />
+            <input type="hidden" formControlName="postalCode" />
+            <input type="hidden" formControlName="contactPerson" />
+            <input type="hidden" formControlName="businessCategory" />
+            <input type="hidden" formControlName="legalForm" />
+          </ng-container>
+
+          <!-- Private Individual Fields -->
+          <ng-container *ngIf="agencyForm.get('customerType')?.value === 'Private Individual'">
+            <div class="flex flex-col">
+              <label class="block font-medium mb-2">Social Security Number <span class="text-red">*</span></label>
+              <div class="flex items-center gap-2">
+                <input type="text" formControlName="socialSecurityNumber" placeholder="Social Security Number"
+                  class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+                <button type="button" (click)="searchPerson()" [disabled]="personSearchLoading"
+                  class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition flex items-center gap-2">
+                  <svg *ngIf="personSearchLoading" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg"
+                    fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                  </svg>
+                  <i class="ri-search-line" *ngIf="!personSearchLoading"></i> Search
+                </button>
+              </div>
+            </div>
+
+            <!-- Hidden Private Individual Fields -->
+            <input type="hidden" formControlName="customerName" />
+            <input type="hidden" formControlName="legalId" />
+            <input type="hidden" formControlName="street" />
+            <input type="hidden" formControlName="city" />
+            <input type="hidden" formControlName="zip" />
+          </ng-container>
+
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Email Address <span class="text-red">*</span></label>
+            <input type="email" formControlName="emailAddress" placeholder="Email address"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Telephone Number</label>
+            <input type="text" formControlName="telephoneNumber" placeholder="Telephone number"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+          </div>
+        </div>
+
+        <!-- Vehicle Information Section -->
+        <div class="font-semibold text-lg mb-4 mt-8">Vehicle Information</div>
+        <div class="mb-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Mileage (km) <span class="text-red">*</span></label>
+            <input type="text" formControlName="mileage" placeholder="Mileage"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Latest Service<span class="text-red">*</span></label>
+            <input type="date" formControlName="latestService"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+
+            <div *ngIf="agencyForm.get('latestService')?.touched && agencyForm.get('latestService')?.invalid"
+              class="text-red-500 text-sm mt-1">
+              <div *ngIf="agencyForm.get('latestService')?.errors?.['required']">Latest service is required</div>
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Number of Keys <span class="text-red">*</span></label>
+            <select formControlName="numberOfKeys" class="w-full px-4 py-2 border border-gray-200 rounded-lg">
+              <option value="">Select</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+            <div *ngIf="agencyForm.get('numberOfKeys')?.touched && agencyForm.get('numberOfKeys')?.invalid"
+              class="text-red-500 text-sm mt-1">
+              <div *ngIf="agencyForm.get('numberOfKeys')?.errors?.['required']">Number of keys is required</div>
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Tires <span class="text-red">*</span></label>
+            <select formControlName="deck" class="w-full px-4 py-2 border border-gray-200 rounded-lg">
+              <option value="">Select</option>
+              <option value="Summer Tires">Summer Tires</option>
+              <option value="Winter Tires">Winter Tires</option>
+              <option value="Summer and Winter Tires">Summer and Winter Tires</option>
+            </select>
+            <div *ngIf="agencyForm.get('deck')?.touched && agencyForm.get('deck')?.invalid"
+              class="text-red-500 text-sm mt-1">
+              <div *ngIf="agencyForm.get('deck')?.errors?.['required']">Tire type is required</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Agency Information Section -->
+        <div class="font-semibold text-lg mb-4 mt-8">Agency Information</div>
+        <div class="mb-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Sales Price</label>
+            <input type="text" formControlName="salesPrice" placeholder="0.00" class="w-full px-4 py-2 border border-gray-200 rounded-lg" 
+              (input)="formatNumber($event, 'salesPrice')" />
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Commission Rate (%)</label>
+            <input type="text" formControlName="commissionRate" placeholder="0" class="w-full px-4 py-2 border border-gray-200 rounded-lg"
+              (input)="formatNumber($event, 'commissionRate')" />
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Commission Amount (SEK)</label>
+            <input type="text" formControlName="commissionAmount" placeholder="0.00" class="w-full px-4 py-2 border border-gray-200 rounded-lg"
+              (input)="formatNumber($event, 'commissionAmount')" />
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Agency Fee (SEK)</label>
+            <input type="text" formControlName="agencyFee" placeholder="0.00" class="w-full px-4 py-2 border border-gray-200 rounded-lg"
+              (input)="formatNumber($event, 'agencyFee')" />
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">Payment Method</label>
+            <select formControlName="paymentMethod" class="w-full px-4 py-2 border border-gray-200 rounded-lg">
+              <option value="">Select payment method</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Swish">Swish</option>
+              <option value="Invoice">Invoice</option>
+            </select>
+          </div>
+          <div class="flex flex-col">
+            <label class="block font-medium mb-2">VAT Type</label>
+            <select formControlName="vatType" class="w-full px-4 py-2 border border-gray-200 rounded-lg">
+              <option value="">Select VAT type</option>
+              <option value="VMB">VMB</option>
+              <option value="VAT">VAT</option>
+            </select>
+          </div>
+          <div class="flex flex-col md:col-span-2">
+            <label class="block font-medium mb-2">Notes</label>
+            <textarea formControlName="notes" rows="3" class="w-full px-4 py-2 border border-gray-200 rounded-lg"></textarea>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-3 mt-8">
+          <ng-container *ngIf="!isEditMode">
+            <button type="submit" (click)="onSubmit()" [disabled]="submitting || submittingAndSigning" class="px-6 py-2 rounded-lg bg-gray-600 text-white font-semibold hover:bg-gray-700 transition flex items-center gap-2">
+              <svg *ngIf="submitting" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {{ submitting ? 'Creating Agreement...' : 'Create Agreement' }}
+            </button>
+            <button type="button" (click)="onSubmitAndSign()" [disabled]="submitting || submittingAndSigning" class="px-6 py-2 rounded-lg bg-primary text-white font-semibold hover:bg-primary-dark transition flex items-center gap-2">
+              <svg *ngIf="submittingAndSigning" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <i class="ri-file-text-line" *ngIf="!submittingAndSigning"></i>
+              {{ submittingAndSigning ? 'Creating & Signing...' : 'Create and Sign Agreement' }}
+            </button>
+          </ng-container>
+          <ng-container *ngIf="isEditMode">
+            <button type="submit" (click)="onSubmit()" [disabled]="submitting || submittingAndSigning" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition flex items-center gap-2">
+              <svg *ngIf="submitting" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Update Agreement
+            </button>
+          </ng-container>
+        </div>
+      </form>
+    </div>
+    <!-- Right: Preview -->
+    <div class="bg-white rounded-2xl shadow p-8 overflow-x-auto">
+      <div class="font-semibold text-lg mb-2">Preview <span class="text-xs text-gray-400 font-normal">(Updated in real time)</span></div>
+      <div class="border rounded-xl p-6 bg-gray-50 min-w-[320px] max-w-full">
+        <div class="text-center text-xl font-extrabold mb-6 tracking-wide break-words">AGENCY AGREEMENT</div>
+
+        <!-- Basic Information -->
+        <div class="bg-white rounded-lg p-4 border mb-4">
+          <div class="font-semibold mb-2">Basic Information</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="text-sm"><span class="text-gray-600">Registration Number:</span> <span
+                class="font-medium text-gray-900">{{ preview.registrationNumber || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Agency Date:</span> <span
+                class="font-medium text-gray-900">{{ preview.agencyDate || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Customer Type:</span> <span
+                class="font-medium text-gray-900">{{ preview.customerType || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Email Address:</span> <span
+                class="font-medium text-gray-900">{{ preview.emailAddress || '...' }}</span></div>
+          </div>
+        </div>
+
+        <!-- Customer Details Card -->
+        <div class="bg-white rounded-lg p-4 border mb-4" *ngIf="preview.customerType">
+          <div class="flex items-center justify-between mb-4">
+            <div class="font-semibold">Customer Details</div>
+            <div class="px-2 py-1 rounded text-xs" [ngClass]="{'bg-blue-100 text-blue-700': preview.customerType === 'Company',
+                           'bg-green-100 text-green-700': preview.customerType === 'Private Individual'}">
+              {{ preview.customerType }}
+            </div>
+          </div>
+
+          <!-- Company Details -->
+          <div class="space-y-3" *ngIf="preview.customerType === 'Company'">
+            <div class="text-sm"><span class="text-gray-600">Organization Number:</span> <span
+                class="font-medium text-gray-900">{{ preview.organizationNumber }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Company Name:</span> <span
+                class="font-medium text-gray-900">{{ preview.companyName }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Contact Person:</span> <span
+                class="font-medium text-gray-900">{{ preview.contactPerson }}</span></div>
+            <div class="mt-4 pt-3 border-t border-gray-100">
+              <div class="text-sm text-gray-600 mb-2">Address Information</div>
+              <div class="text-sm">{{ preview.streetAddress }}</div>
+              <div class="text-sm">{{ preview.postalCode }} {{ preview.city }}</div>
+            </div>
+          </div>
+
+          <!-- Private Individual Details -->
+          <div class="space-y-3" *ngIf="preview.customerType === 'Private Individual'">
+            <div class="text-sm"><span class="text-gray-600">Name:</span> <span class="font-medium text-gray-900">{{
+                preview.customerName }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Legal ID:</span> <span class="font-medium text-gray-900">{{
+                preview.legalId }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Telephone:</span> <span
+                class="font-medium text-gray-900">{{ preview.telephoneNumber }}</span></div>
+            <div class="mt-4 pt-3 border-t border-gray-100">
+              <div class="text-sm text-gray-600 mb-2">Address Information</div>
+              <div class="text-sm">{{ preview.street }}</div>
+              <div class="text-sm">{{ preview.zip }} {{ preview.city }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vehicle Information -->
+        <div class="bg-white rounded-lg p-4 border mb-4">
+          <div class="font-semibold mb-2">Vehicle Information</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="text-sm"><span class="text-gray-600">Registration Number:</span> <span
+                class="font-medium text-gray-900">{{ preview.registrationNumber || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Brand:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.detail?.vehicleBrandRaw || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Model:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.detail?.vehicleModel || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Year:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.detail?.vehicleModelYear || vehicleDetails?.detail?.vehicleYear || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Color:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.detail?.color || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Vehicle Category:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.detail?.vehicleType || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Chassis Number:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.detail?.chassisNumber || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Number of Passengers:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.technicalData?.numberOfPassengers || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Gearbox:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.technicalData?.gearbox || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Fuel Type:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.technicalData?.fuelCodes?.join(', ') || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Total Weight:</span> <span
+                class="font-medium text-gray-900">{{ vehicleDetails?.technicalData?.totalWeight ? vehicleDetails.technicalData.totalWeight + ' kg' : '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Mileage (km):</span> <span
+                class="font-medium text-gray-900">{{ preview.mileage || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Latest Service:</span> <span
+                class="font-medium text-gray-900">{{ preview.latestService || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Keys:</span> <span
+                class="font-medium text-gray-900">{{ preview.numberOfKeys || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Tires:</span> <span
+                class="font-medium text-gray-900">{{ preview.deck || '...' }}</span></div>
+          </div>
+        </div>
+
+        <!-- Agency Information -->
+        <div class="bg-white rounded-lg p-4 border mb-4">
+          <div class="font-semibold mb-2">Agency Information</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="text-sm"><span class="text-gray-600">Sales Price:</span> <span
+                class="font-medium text-gray-900">{{ preview.salesPrice || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Commission Rate:</span> <span
+                class="font-medium text-gray-900">{{ preview.commissionRate || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Commission Amount:</span> <span
+                class="font-medium text-gray-900">{{ preview.commissionAmount || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Agency Fee:</span> <span
+                class="font-medium text-gray-900">{{ preview.agencyFee || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Payment Method:</span> <span
+                class="font-medium text-gray-900">{{ preview.paymentMethod || '...' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">VAT Type:</span> <span
+                class="font-medium text-gray-900">{{ preview.vatType || '...' }}</span></div>
+          </div>
+        </div>
+
+        <!-- Buyer (Agency) -->
+        <div class="bg-white rounded-lg p-4 border mb-4">
+          <div class="font-semibold mb-2">Buyer Information</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="text-sm"><span class="text-gray-600">Name:</span> <span class="font-medium text-gray-900">{{
+                preview.agency?.name || '' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Organization Name:</span> <span
+                class="font-medium text-gray-900">{{ preview.agency?.organizationName || '' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Organization Number:</span> <span
+                class="font-medium text-gray-900">{{ preview.agency?.organizationNumber || '' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Email:</span> <span class="font-medium text-gray-900">{{
+                preview.agency?.email || '' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Phone:</span> <span class="font-medium text-gray-900">{{
+                preview.agency?.phone || '' }}</span></div>
+            <div class="text-sm"><span class="text-gray-600">Address:</span> <span class="font-medium text-gray-900">{{
+                preview.agency?.address || '' }}</span></div>
+            
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="bg-white rounded-lg p-4 border mb-4" *ngIf="preview.notes">
+          <div class="font-semibold mb-2">Additional Notes</div>
+          <div class="text-sm">{{ preview.notes }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Vehicle Details Modal -->
+<div
+  *ngIf="showVehicleDetailsModal"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+>
+  <div class="bg-white rounded-xl w-full max-w-5xl p-8 max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">Vehicle Details</h2>
+      <button
+        (click)="closeVehicleDetailsModal()"
+        class="text-gray-500 hover:text-gray-700"
+      >
+        <i class="ri-close-line text-2xl"></i>
+      </button>
+    </div>
+    <!-- Vehicle Details Grid (copy from purchase agreement modal) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Registration Details -->
+      <div class="bg-gray-50 rounded-lg p-4">
+        <h3 class="font-semibold text-lg mb-4">Registration Information</h3>
+        <div class="space-y-2">
+          <div>
+            <span class="text-gray-500">Registration Number:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.registrationData?.registrationNumber || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Registered On:</span>
+            <input 
+              type="text" 
+              [value]="formatDate(vehicleDetails?.registrationData?.registeredOn)" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Country:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.country || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+        </div>
+      </div>
+      <!-- Vehicle Details -->
+      <div class="bg-gray-50 rounded-lg p-4">
+        <h3 class="font-semibold text-lg mb-4">Vehicle Specifications</h3>
+        <div class="space-y-2">
+          <div>
+            <span class="text-gray-500">Brand:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.detail?.vehicleBrandRaw || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Model:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.detail?.vehicleModel || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Model Year:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.detail?.vehicleModelYear || vehicleDetails?.detail?.vehicleYear || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Vehicle Type:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.detail?.vehicleType || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Color:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.detail?.color || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+        </div>
+      </div>
+      <!-- Technical Details -->
+      <div class="bg-gray-50 rounded-lg p-4">
+        <h3 class="font-semibold text-lg mb-4">Technical Information</h3>
+        <div class="space-y-2">
+          <div>
+            <span class="text-gray-500">Chassis Number:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.detail?.chassisNumber || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Model Number:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.detail?.modelNumber || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Gearbox:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.technicalData?.gearbox || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Fuel Type:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.technicalData?.fuelCodes?.join(', ') || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+        </div>
+      </div>
+      <!-- Status Details -->
+      <div class="bg-gray-50 rounded-lg p-4">
+        <h3 class="font-semibold text-lg mb-4">Status Information</h3>
+        <div class="space-y-2">
+          <div>
+            <span class="text-gray-500">Status Code:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.status?.code || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Registration Type:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.status?.registrationType || 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Registration Date:</span>
+            <input 
+              type="text" 
+              [value]="formatDate(vehicleDetails?.detail?.registrationDate)" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Leased:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.status?.leased ? 'Yes' : 'No'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+        </div>
+      </div>
+      <!-- Inspection Details -->
+      <div class="bg-gray-50 rounded-lg p-4">
+        <h3 class="font-semibold text-lg mb-4">Inspection Information</h3>
+        <div class="space-y-2">
+          <div>
+            <span class="text-gray-500">Last Inspection:</span>
+            <input 
+              type="text" 
+              [value]="formatDate(vehicleDetails?.inspection?.inspectionDate)" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Inspection Valid Until:</span>
+            <input 
+              type="text" 
+              [value]="formatDate(vehicleDetails?.inspection?.inspectionDateUpToAndIncluding)" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <span class="text-gray-500">Mileage:</span>
+            <input 
+              type="text" 
+              [value]="vehicleDetails?.inspection?.mileage ? (vehicleDetails.inspection.mileage + ' km') : 'N/A'" 
+              disabled 
+              class="w-full bg-white border border-gray-200 rounded px-3 py-2 mt-1"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
